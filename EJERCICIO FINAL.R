@@ -1,6 +1,7 @@
 #EJERCICIO FINAL
 #Este ejercicio consiste en mostrar la capacidad del alumno/a de: 
 
+
 # 1) Importar bases de datos en R y hacer las comprobaciones pertinentes. 
 # Importante describir y explicar cada paso en el Script.
 
