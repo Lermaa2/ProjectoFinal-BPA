@@ -1,0 +1,1 @@
+"0","data.frame(Datos_Na=sum(is.na(data)),Datos_Null=sum(is.null(data)))"

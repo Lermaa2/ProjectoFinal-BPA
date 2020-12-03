@@ -1,0 +1,2 @@
+"0","Geotabla <- data.frame(table(data$Geography))"
+"0","Geotabla$Porc <- c(table(data$Geography))*100/length(data$Geography); Geotabla"

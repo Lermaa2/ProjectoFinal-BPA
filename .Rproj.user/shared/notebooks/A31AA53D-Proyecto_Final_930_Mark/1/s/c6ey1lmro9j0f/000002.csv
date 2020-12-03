@@ -1,0 +1,2 @@
+"0","data.frame( Datos_unicos_CustomerId=length(unique(data$CustomerId) ),"
+"0","            Observaciones=length(data$CustomerId) )"

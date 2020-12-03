@@ -1,0 +1,2 @@
+"0","Gentabla <- data.frame(table(data$Gender))"
+"0","Gentabla$Porc <- c(table(data$Gender))*100/length(data$Gender); Gentabla"

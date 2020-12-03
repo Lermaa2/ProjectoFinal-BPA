@@ -1,0 +1,6 @@
+"0","data <- read.csv(""https://raw.githubusercontent.com/Lermaa2/ProjectoFinal-BPA/68c182ad59e0039875994b11acfcd40a66949acd/Dataset_Compradores.csv""
+                 ,dec=""."")
+"
+"2","fallo en InternetOpenUrl: 'No se pudo resolver el nombre de servidor ni su dirección'"
+"2","Error in file(file, ""rt"") : no se puede abrir la conexiÃ³n
+"

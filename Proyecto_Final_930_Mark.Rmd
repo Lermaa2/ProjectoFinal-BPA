@@ -1,0 +1,255 @@
+---
+title: "Proyecto Business Performance Analysis"
+author: "Jaime Salazar"
+date: "1/12/2020"
+output: html_document
+---
+## Intro
+
+Se trabajara con la base de datos suministrada "Dataset_Compradores.csv".
+Una inspección preliminar nos permite confirmar ciertos puntos:
+
+-A primera vista los datos se ven correctamente separados por comas (",") y poseen encabezado en la primera fila
+
+-Existen datos con numeros reales (Flotantes) con variaciones en el orden de las centesimas
+
+Algunas consideraciones:
+
+-No se manejeran tildes en el script para evitar errores por Enconding.
+
+Se procede a cargar los datos y la verificación detallada del contenido de cada variable.
+
+Adicionalmente, se cargan las liberias a utilizar a lo largo del proyecto:
+
+
+```{r Librerias}
+library(dplyr) #Herramientas para manipulación de datos
+library(DescTools) #Herramientas para estadística descriptiva y análisis de datos
+library(ggplot2) #Herramientas de visualziación y representación de datos  
+library(psych) #Herramientas de entrada de datos y análisis descriptivo.
+library(scales) #Herramienta complemento de "ggplot2"
+```
+
+La base de datos sera manejada en la siguiente variable.
+Para estandarización, se extrae desde url:
+
+```{r}
+data <- read.csv("https://raw.githubusercontent.com/Lermaa2/ProjectoFinal-BPA/68c182ad59e0039875994b11acfcd40a66949acd/Dataset_Compradores.csv"
+                 ,dec=".")
+```
+```{r}
+data <- read.csv(file.choose() )
+```
+
+
+Realizamos una inspección rapida de los datos inicialmente:
+
+```{r}
+head(data,3);tail(data,3)
+```
+
+Se observa que no existen notas, pie de paginas o similares que pudieran requerir ser removidos antes del analisis. 
+
+Se busca identificar si existen valores nulos o NA
+
+```{r}
+data.frame(Datos_Na=sum(is.na(data)),Datos_Null=sum(is.null(data)))
+```
+De esta forma, se puede confirmar que no hay entradas con valores nulos o NA.
+
+A continuación se busca identificar y entender las variables a manejar:
+
+```{r}
+str(data)
+```
+
+```{r}
+x=describe(data)
+x[c("vars","n","max","min")]
+```
+
+Se puede notar que existen 10000 observaciones y 14 variables, guardadas en un objeto tipo DataFrame.
+
+Estas se resumen de la siguiente manera:
+
+RowNumber   : Corresponde al Indice de las entradas. Variable categorica ("int").
+
+CustomerId  : Identifiación del cliente, Variable tipo cuantitativa discreta ("int").
+
+```{r}
+data.frame( Datos_unicos_CustomerId=length(unique(data$CustomerId) ),
+            Observaciones=length(data$CustomerId) )
+```
+Mediante esta función es posible identificar que cada entrada de CustomerId es unica, dado que existe el mismo numero de datos no repetidos que registros de los datos.  
+
+Surname     : Apellido de los clientes. Variable categorica nominal ("chr").
+
+CreditScore : Score de Credito, mide la valoracion de cada cliente basado en el historial crediticio. Valores cuantitativos, discretos ("int").
+
+
+```{r}
+describe(data$CreditScore)[-c(1,2)];summary(data$CreditScore)
+
+
+
+```
+
+```{r, fig.dim= c(2,2)}
+
+CSb=ggplot(data,aes("CreditScore",CreditScore))+
+  geom_boxplot()+
+  geom_point(aes("CreditScore",mean(CreditScore)),
+             pch=4,bg="red",
+             size=5)+
+#  geom_violin(aes("CreditScore",CreditScore),alpha=0.5)+
+  geom_hline(yintercept=c(580,670,740,800),colour=c("red","orange","yellow","green"))+ theme_classic()
+
+CSv=ggplot(data,aes("CreditScore",CreditScore))+
+#  geom_boxplot()+
+  geom_point(aes("CreditScore",mean(CreditScore)),
+             pch=4,bg="red",
+             size=5)+
+  geom_violin(aes("CreditScore",CreditScore),alpha=0.5)+
+  geom_hline(yintercept=c(580,670,740,800),colour=c("red","orange","yellow","green"))+ theme_classic()
+
+CSb;CSv
+```
+
+```{r}
+
+Poor<-sum(table(data$CreditScore[data$CreditScore<580]))/length(data$CreditScore)*100
+
+Fair<-sum(table(data$CreditScore[data$CreditScore>=580&data$CreditScore<670]))/length(data$CreditScore)*100
+
+Good<-sum(table(data$CreditScore[data$CreditScore>=670&data$CreditScore<740]))/length(data$CreditScore)*100
+
+Very_good<-sum(table(data$CreditScore[data$CreditScore>=740&data$CreditScore<800]))/length(data$CreditScore)*100
+
+Excellent<-sum(table(data$CreditScore[data$CreditScore>=800]))/length(data$CreditScore)*100
+
+por_cs <-c(Poor,Fair,Good,Very_good,Excellent)
+n_cs <-por_cs/100*length(data$CreditScore)
+
+CatCredito <- matrix(c(por_cs,n_cs),2,5,byrow=T)
+
+rownames(CatCredito) <-c("%","n")
+colnames(CatCredito) <-c("Poor","Fair","Good","Very_good","Excellent")
+CatCredito
+```
+
+
+Geography   : Pais de origen de cada cliente. Variable cualitativa, categorica nominal ("chr")
+
+
+```{r}
+table(data$Geography)
+
+Geob = ggplot(data, aes(x="",y=Geography,fill=Geography))+
+  geom_bar(stat="identity")+
+  coord_polar("y",start=0)
+
+
+Geob
+```
+```{r}
+Geotabla <- data.frame(table(data$Geography))
+Geotabla$Porc <- c(table(data$Geography))*100/length(data$Geography); Geotabla
+```
+
+Se tiene un total de 10000 observaciones de las cuales 50.14% corresponden a clientes franceses, 25.09% alemanes y 24.77% españoles
+
+Gender      : Corresponde al genero de cada cliente. Variable cualitativa, categorica, nominal. Si bien se importa como tipo "chr", se transformara a tipo factor.
+
+```{r}
+data$Gender <- factor(data$Gender,labels = c("Female","Male"))
+str(data$Gender)
+```
+```{r}
+Gentabla <- data.frame(table(data$Gender))
+Gentabla$Porc <- c(table(data$Gender))*100/length(data$Gender); Gentabla
+
+Genb = ggplot(data, aes(Gender,fill=Gender))+
+  geom_bar();Genb
+```
+Se tiene un total de 10000 observaciones de las cuales 54.57% corresponden a clientes masculinos y 45.43% femeninos.
+
+Age         :  Edad de cada cliente. Variable cuantitativa, discreta ("int").
+
+```{r}
+ggplot(data,aes(Age))+ geom_histogram(aes(color="black"))
+
+ggplot(data,aes(Age))+ geom_boxplot()
+
+summary(data$Age)
+```
+Se observa que todos los clientes de la muestra son mayores de edad (>18 años) con una media de 39 años. En la misma, se puede ver que el 75% de los clientes tienen menos de 44.
+
+Tenure       : 
+
+
+```{r}
+summary(data$Tenure)
+ggplot(data,aes(Tenure))+geom_bar()
+ggplot(data,aes(Tenure))+geom_boxplot()
+ggplot(data,aes(Tenure))+geom_density()
+ggplot(data,aes(Tenure))+geom_histogram()
+```
+##PREGUNTAR
+
+Balance      : Indica balance monetario de cada cliente. Variable cuantitativa, continua ("int")
+
+```{r}
+summary(data$Balance)
+ggplot(data,aes(Balance))+geom_boxplot()
+ggplot(data,aes(Balance))+geom_density()
+ggplot(data,aes(Balance))+geom_histogram()
+```
+
+```{r}
+Bal <- data%>%
+  filter(Balance!= 0)
+
+summary(Bal$Balance)
+describe(Bal$Balance)
+ggplot(Bal,aes(Balance))+geom_boxplot()
+ggplot(Bal,aes(Balance))+geom_density()
+ggplot(Bal,aes(Balance))+geom_histogram()
+```
+
+
+
+NumOfProducts : Indica la cantidad de productos bancarios de cada cliente. Variable cuantitativa discreta ("int").
+
+```{r}
+summary(data$NumOfProducts)
+describe(data$NumOfProducts)
+table(data$NumOfProducts)
+ggplot(data,aes(NumOfProducts))+geom_boxplot()
+ggplot(data,aes(NumOfProducts))+geom_density()
+ggplot(data,aes(NumOfProducts))+geom_histogram()
+```
+
+HasCrCard       : Indica si el cliente tiene o no Tarjeta de Credito del banco. Variable cualitativa, nominal. Si bien se importa como tipo "int", se transformara a tipo factor dado que .
+
+```{r}
+data$HasCrCard <- factor(data$HasCrCard,labels = c("No","Yes"), levels = c(0,1))
+str(data$HasCrCard)
+```
+IsActiveMember 
+EstimatedSalary: 
+Exited    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,11 @@
+"0","library(scales)
+"
+"2","
+Attaching package: ‘scales’
+
+"
+"2","The following objects are masked from ‘package:psych’:
+
+    alpha, rescale
+
+"

@@ -1,0 +1,3 @@
+"0",""
+"0","Genb = ggplot(data, aes(Gender,fill=Gender))+"
+"0","  geom_bar();Genb"

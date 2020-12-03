@@ -1,0 +1,36 @@
+"0","library(dplyr) #Herramientas para manipulaci√≥n de datos
+"
+"2","
+Attaching package: ëdplyrí
+
+"
+"2","The following objects are masked from ëpackage:statsí:
+
+    filter, lag
+
+"
+"2","The following objects are masked from ëpackage:baseí:
+
+    intersect, setdiff, setequal, union
+
+"
+"0","library(dplyr) #Herramientas para manipulaci√≥n de datos"
+"0","library(DescTools) #Herramientas para estad√≠stica descriptiva y an√°lisis de datos"
+"0","library(ggplot2) #Herramientas de visualziaci√≥n y representaci√≥n de datos  "
+"0","library(DescTools) #Herramientas para estad√≠stica descriptiva y an√°lisis de datos"
+"0","library(ggplot2) #Herramientas de visualziaci√≥n y representaci√≥n de datos  "
+"0","library(psych) #Herramientas de entrada de datos y an√°lisis descriptivo."
+"2","
+Attaching package: ëpsychí
+
+"
+"2","The following objects are masked from ëpackage:ggplot2í:
+
+    %+%, alpha
+
+"
+"2","The following objects are masked from ëpackage:DescToolsí:
+
+    AUC, ICC, SD
+
+"
