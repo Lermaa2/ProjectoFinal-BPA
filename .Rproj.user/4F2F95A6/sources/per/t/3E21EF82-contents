@@ -1,0 +1,165 @@
+###################### Jaime Salazar ###################### 
+
+library(ggplot2)
+library(dplyr)
+library(ggthemes)
+
+#install.packages("cowplot")
+#install.packages("gridExtra")
+
+library(cowplot)
+library(gridExtra)
+
+#Ej.1. Importa la base de datos "agregados.csv" y averigua que variables categoricas contiene
+
+data <- read.csv(file.choose(),dec=",")
+tail(data[,1])
+data<-data[1:1729,];tail(data[,1:4])#Eliminar ultimas notas, existen mejores opciones
+
+### Muestra las frecuencias de la variable CCAA en una tabla 
+
+
+fqc<- data.frame(table(data$CCAA)) ;fqc
+
+
+### Muestra las frecuencias de la variable CCAA en un grafico apropiado para este tipo de datos
+
+ggplot(data,aes(CCAA)) + geom_bar(aes(fill = "paleturquoise1"))+
+  theme(legend.position = "none")+
+  theme_classic()+
+  labs(x = "CCAA",y="Fqcy")
+
+
+#Ej 2. Representa la variable Hospitalizados en un histograma
+#y comparala con la distribucion normal esperada
+
+
+ggplot(data,aes(Hospitalizados)) + 
+  geom_histogram(fill="#0A85C2",colour = "#414242",bins=20,na.rm=T)+
+  theme_classic()+
+  theme(legend.position = "none")+
+  labs(x = "Hopitalizados",y="Fqcy")
+
+## Se intenta comparar con una distribución normal, pero no resulta bien.
+## Se puede presentar el problema en clase:
+
+#MHosp <- mean(data$Hospitalizados,na.rm = T)
+#SDHosp <- sd(data$Hospitalizados,na.rm = T)
+#valores <- data.frame(value=rnorm(length(data$Hospitalizados),MHosp,SDHosp))
+#hospitalizados <- data.frame(value=data$Hospitalizados)
+
+#valores$group <- "Normal"
+#hospitalizados$group <- "Hospitalizados"
+
+
+#compare <- rbind(valores,hospitalizados);head(compare)
+
+  
+#ggplot(compare,aes(value, fill = group)) + 
+#  geom_histogram(alpha = 0.5,na.rm=T,position = 'identity')+
+#  theme_classic()+
+ # labs(x = "Hopitalizados",y="Fqcy")+
+ # ggtitle("Histograma Hospitalizados")
+
+
+#Ej. 3. Con la base de datos "encuesta.dat", contesta a las siguientes preguntas:
+
+
+encuesta <- read.table(choose.files(), header=T, sep="\t",dec=',')
+encuesta$Sexo<- factor(encuesta$Sexo, levels = c(2,1), labels = c("Mujer", "Hombre"))
+
+
+### Observa las puntuaciones de las variables de Edad y Unidades de alcohol e intenta hacer comparaciones entre ellas
+
+box <- ggplot(encuesta, aes(UnidadesAlcohol,Edad,group=UnidadesAlcohol))+
+  geom_boxplot(alpha=0.7,fill="#005078")+
+  theme_classic()+
+  labs(x = "Uni de Alcohol",y="Edad")+
+  ggtitle("Box")
+
+bars1 <- ggplot(encuesta, aes(UnidadesAlcohol))+
+  geom_bar(alpha=0.7,fill="#024f05")+
+  theme_classic()+
+  labs(x = "Uni de Alcohol",y="Fqcy")+
+  ggtitle("Unidades de Alcohol -  Frecuencia")
+
+bars2 <- ggplot(encuesta, aes(Edad, group=UnidadesAlcohol))+
+  geom_bar(alpha=0.7,fill="#0A85C2")+
+  theme_classic()+
+  labs(x = "Edad",y="Fqcy")+
+  ggtitle("Unidades de Alcohol -  Frecuencia")
+
+point1 <- ggplot(encuesta, aes(Edad, UnidadesAlcohol))+
+  geom_jitter(alpha=0.5,fill="#000a3b")+
+  theme_classic()+
+  labs(x = "Edad",y="Unidades de Alcohol")+
+  ggtitle("Points")
+
+den <- ggplot(encuesta, aes(Edad))+
+  geom_density(alpha=0.5)+
+  facet_wrap(~UnidadesAlcohol)+
+  theme_classic()+
+  labs(x = "Edad",y="")+
+  ggtitle("Densidad por Un de Alcohol");den
+
+
+plot_grid(bars1, bars2,box,point1,labels=c("", "", "",""), ncol = 2, nrow = 2)
+
+    #-De la muestra suministrada,y teniendo en cuenta la relación entre las variables
+    #Edad y UnidadesAlcohol. Se puede observar que luego de los 20 años, no hay Notas
+    #de 0. Ademas, los puntajes mas altos se concentran en edades menores a 20.
+
+### Ahora fijate en la dispersion de las notas esperadas en la PAU y las notas obtenidas, ?que puedes comentar sobre ellas?
+### Haz un grafico adecuado que las represente
+
+
+ggplot(encuesta, aes(NotaEsperada,Nota_PAU , group=NotaEsperada, colour=Sexo))+
+  geom_boxplot(alpha=0.5,fill="#c1c1c7")+
+  geom_segment(aes(x = 3, y = 3, xend = 9, yend = 9))+
+  facet_wrap(~Sexo)+
+  theme_classic()+
+  labs(x = "Nota Esperada",y="Nota PAU")
+
+
+    ##Se agrega una linea diagonal que separa el grafico en 2. La parte
+    ##Inferior corresponde a los datos donde la nota real es inferior a la
+    ##esperada, lo contrario con la superior. Se observa que para las
+    ##mujeres, en ningun caso se alcanzo la nota esperada. Mientras que para los 
+    ##hombres, solo se alcanza en la mayoria de los casos cuando la nota esperada
+    ##era menor que 5,5. Para hombres con nota esperada de 6, solo la mitad
+    ##la alcanzo y para hombres con nota esperada mayor a 6, no se alcanzo 
+    ##en ningún caso (solo datos atipicos).
+
+
+#Ej. 4. Estandariza las puntuaciones de las variables fluidez en espa?ol y fluidez en ingles
+
+zEsp= data.frame(z=(encuesta$FluidezVerbalEspanol-mean(encuesta$FluidezVerbalEspanol))/sd(encuesta$FluidezVerbalEspanol))
+zIng= data.frame(z=(encuesta$FluidezVerbalIngles-mean(encuesta$FluidezVerbalIngle))/sd(encuesta$FluidezVerbalIngle))
+
+zEsp$idioma="Esp"
+zIng$idioma="Ing"
+
+ej4 <- rbind(zEsp,zIng)
+
+ggplot(ej4, aes(z,group=idioma,fill=idioma,colour=idioma))+
+  geom_density(alpha=0.5,fill="#c1c1c7")+
+  facet_wrap(~encuesta$Sexo)+
+  theme_classic()+
+  labs(x = "Fluidez (densidad)",y="")
+
+### Comenta las puntuaciones estandarizadas obtenidas con respecto a las puntuaciones directas
+
+    ##Se observa que, para el caso de las mujeres, las Fluidez en Español 
+    ##alta es la Moda y con valores superiores a los de la Fluidez en Ingles.
+    ##Caso contario par alos Hombres.
+    ##Ademas, se nota dos diferentes picos tando en Fluidez Español Mujeres como
+    ##en FLuidez Ingles Hombres. Esto podría denotar sub grupos diferenciados
+    ##en cada caso con respecto a otra variable (medida o nó). Este podria ser
+    ##el paso continuo de este ejercicio.
+
+
+ggplot(ej4, aes(z,group=idioma,fill=idioma,colour=idioma))+
+  geom_density(alpha=0.5,fill="#c1c1c7")+
+  theme_classic()+
+  labs(x = "Fluidez (densidad)",y="")
+

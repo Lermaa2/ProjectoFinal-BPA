@@ -1,0 +1,69 @@
+#Ejercicios Modulo III (3)
+
+
+#Ej. 1. Calcula la probabilidad de
+
+#*1) una variable que se distribuye normalmente es mayor a 3
+#En una distribución normal estadanrizada:
+print(c("P@normal_estandar(x>3) :",(1-pnorm(3))*100,"%"))
+1-pnorm(3)
+
+#*2) una variable que se distribute normalmente con media = 35 y DT = 6 es mayor a 42
+
+print(c("P@normal_estandar(x>3) :",(1-pnorm(42,35,6))*100,"%"))
+1-pnorm(42,35,6)
+
+#Ej 2.Abre la base de datos 'agregados.csv'
+
+    #Se cargan los datos.
+data <- read.csv(file.choose(),dec=",")
+data <- data[1:1729,]
+#2.1 Genera de manera aleatoria la variable categorica TestDico que contenga valores si,no 
+# (como si reflejara que el test ha dado positivo o no)
+
+
+TestDico <- factor(sample(c("Si","No"),length(data$Hospitalizados), replace = T),
+                   labels = c("Si","No"))
+
+
+sum(is.na(data$Hospitalizados))
+
+##2.2. haz un analisis estadistico que pruebe si la diferencia en hospitalizados es diferente
+## entre aquellos casos que dieron positivo en el test y aquellos que no
+
+
+    #Se supone, normalidad, varianzas iguales y aleatoriedad
+t.test(data$Hospitalizados ~ TestDico,var.equal=T)
+
+    ##Para el ejemplo en particular (se uso un sample), p-value = 0.8929
+    ##confidence interval: -802.1425  920.4384
+    ##Indicando que se no se rechaza Ho  y entonces las medias no son 
+    ##significativamente distintas
+
+
+#Test de variables 
+
+
+##2.3. Comprueba los supuestos de normalidad e igualdad de varianzas. Para ello, ver:
+
+    #Prueba Varianza
+var.test(data$Hospitalizados ~ TestDico)
+bartlett.test(data$Hospitalizados ~ TestDico)
+
+
+shapiro.test(data$Hospitalizados)
+ks.test(data$Hospitalizados,"pnorm")
+
+
+#graficos donde se vea la distribuci?n, graficos de normalidad, 
+#indices de la forma de la distribucion...
+
+#Ej 3. Haz un analisis estadistico que pruebe si la diferencia en hospitalizados es diferente
+## en las comunidades autonomas de Madrid (CM) Extremadura (EX) y Andalucia (AN)
+
+###3.1. Comprueba el supuesto de normalidad
+
+
+
+## Simetria < 2 (valor absoluto)
+##Kurtosis < 7 (Valor absoluto)
