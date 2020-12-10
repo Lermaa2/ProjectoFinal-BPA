@@ -1,0 +1,37 @@
+"0","library(tidyverse) # tidyr, dplyr, ggplot2, purrr..... "
+"0","library(DescTools) #Herramientas para estad√≠stica descriptiva y an√°lisis de datos"
+"0","library(psych) #Herramientas de entrada de datos y an√°lisis descriptivo."
+"2","
+Attaching package: ëpsychí
+
+"
+"2","The following objects are masked from ëpackage:DescToolsí:
+
+    AUC, ICC, SD
+
+"
+"2","The following objects are masked from ëpackage:ggplot2í:
+
+    %+%, alpha
+
+"
+"0","library(scales) #Herramienta complemento de ""ggplot2"""
+"2","
+Attaching package: ëscalesí
+
+"
+"2","The following objects are masked from ëpackage:psychí:
+
+    alpha, rescale
+
+"
+"2","The following object is masked from ëpackage:purrrí:
+
+    discard
+
+"
+"2","The following object is masked from ëpackage:readrí:
+
+    col_factor
+
+"

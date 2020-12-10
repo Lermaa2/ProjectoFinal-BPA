@@ -1,0 +1,4 @@
+"0",""
+"0","var_cuant_dis <- data %>%  select(CreditScore,"
+"0","                                  Age,Tenure,"
+"0","                                  NumOfProducts); head(var_cont_dis)"
