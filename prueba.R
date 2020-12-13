@@ -266,6 +266,8 @@ col_summary <- function(data, col_names, na.rm = TRUE) {
     ))
 }
 
+
+
 flights_with_airline_names %>%
   col_summary(c(air_time, arr_delay))
 

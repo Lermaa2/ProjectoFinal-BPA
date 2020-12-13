@@ -69,11 +69,7 @@ x[c("vars","n","max","min")]
 
 Se puede notar que existen 10000 observaciones y 14 variables, guardadas en un objeto tipo DataFrame.
 
-Estas se resumen de la siguiente manera:
 
-RowNumber   : Corresponde al Indice de las entradas. Variable categorica ("int").
-
-CustomerId  : Identifiación del cliente, Variable tipo cuantitativa discreta ("int").
 
 ```{r}
 data.frame( Datos_unicos_CustomerId=length(unique(data$CustomerId) ),

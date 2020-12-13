@@ -1,0 +1,5 @@
+"0","var_cual_nomi <- data %>%  select(Geography,"
+"0","                                  Gender,"
+"0","                                  NumOfProducts,"
+"0","                                  HasCrCard,"
+"0","                                  IsActiveMember);head(var_cual_nomi)"
