@@ -28,17 +28,16 @@ library(DescTools) #Herramientas para estadística descriptiva y análisis de da
 library(ggplot2) #Herramientas de visualziación y representación de datos  
 library(psych) #Herramientas de entrada de datos y análisis descriptivo.
 library(scales) #Herramienta complemento de "ggplot2"
+library(moments) #Herramienta para evaluar normalidad
 ```
 
 La base de datos sera manejada en la siguiente variable.
 Para estandarización, se extrae desde url:
-
+Se omite la ultima variable "Exited"
 ```{r}
 data <- read.csv("https://raw.githubusercontent.com/Lermaa2/ProjectoFinal-BPA/68c182ad59e0039875994b11acfcd40a66949acd/Dataset_Compradores.csv"
                  ,dec=".")
-```
-```{r}
-data <- read.csv(file.choose() )
+data<-data[1:13]
 ```
 
 
@@ -136,6 +135,33 @@ rownames(CatCredito) <-c("%","n")
 colnames(CatCredito) <-c("Poor","Fair","Good","Very_good","Excellent")
 CatCredito
 ```
+```{r}
+ks.test(data$CreditScore, "pnorm")
+```
+La hipotesis nula (Ho) asegura que los datos proceden de una distribucion normal.
+La hipotesis alternativa (H1) asegura que los datos no proceden de una distribucion normal.
+Si p-value es >0,05, se acepta la hipotesis nula, es decir, la normalidad de la distribucion.
+Al ser nuestro p-value=2.2e-16 ~ 0, menor a 0.05, rechazamos la hipotesis nula. Por tanto, nuestros datos no siguen una distribucion normal.
+
+```{r}
+IQR_CS<-IQR(data$CreditScore)
+Outliersup_CS<-quantile(data$CreditScore, prob=c(0.25))+1.5*IQR_CS;Outliersup_CS
+Outliersdown_CS<-quantile(data$CreditScore, prob=c(0.25))-1.5*IQR_CS;Outliersdown_CS
+```
+Para la extraccion de  outliers, se calcula primero Q1+1.5*IQR que da el ultimo valor por encima que no es outlier (785).
+Posteriormente, utilizando Q1-1.5*IQR, se obtiene el ultimo valor por debajo que no es outlier (383).
+
+```{r}
+length(filter(data,CreditScore<383)$CreditScore)
+```
+Se observa que por debajo, hay 15 outliers.
+
+```{r}
+length(filter(data,CreditScore>785)$CreditScore)
+
+
+```
+Se observa que por arriba, hay 872 outliers.
 
 
 Geography   : Pais de origen de cada cliente. Variable cualitativa, categorica nominal ("chr")
@@ -184,7 +210,34 @@ summary(data$Age)
 ```
 Se observa que todos los clientes de la muestra son mayores de edad (>18 años) con una media de 39 años. En la misma, se puede ver que el 75% de los clientes tienen menos de 44.
 
-Tenure       : 
+```{r}
+ks.test(data$Age, "pnorm")
+agostino.test(data$Age)
+```
+El p-value=0, menor a 0.05, rechazamos la hipotesis nula. Por tanto, nuestros datos no siguen una distribucion normal.
+```{r}
+IQR_Age<-IQR(data$Age)
+Outliersup_Age<-quantile(data$Age, prob=c(0.25))+1.5*IQR_Age;Outliersup_Age
+Outliersdown_Age<-quantile(data$Age, prob=c(0.25))-1.5*IQR_Age;Outliersdown_Age
+```
+El ultimo valor por encima que no es outlier (50).
+El ultimo valor por debajo que no es outlier (14).
+
+```{r}
+length(filter(data,Age<14)$Age)
+
+```
+Se observa que por debajo, no hay outliers.
+
+```{r}
+length(filter(data,Age>50)$Age)
+
+
+```
+Se observa que por arriba, hay 1261 outliers.
+
+
+Tenure       : Indica el tiempo en meses que tiene hasta el pago de la totalidad de la deuda.
 
 
 ```{r}
@@ -194,9 +247,33 @@ ggplot(data,aes(Tenure))+geom_boxplot()
 ggplot(data,aes(Tenure))+geom_density()
 ggplot(data,aes(Tenure))+geom_histogram()
 ```
-##PREGUNTAR
+```{r}
+ks.test(data$Tenure, "pnorm")
+```
+El p-value=0, menor a 0.05, rechazamos la hipotesis nula. Por tanto, nuestros datos no siguen una distribucion normal
 
-Balance      : Indica balance monetario de cada cliente. Variable cuantitativa, continua ("int")
+```{r}
+IQR_Tenure<-IQR(data$Tenure)
+Outliersup_Tenure<-quantile(data$Tenure, prob=c(0.25))+1.5*IQR_Tenure;Outliersup_Tenure
+Outliersdown_Tenure<-quantile(data$Tenure, prob=c(0.25))-1.5*IQR_Tenure;Outliersdown_Tenure
+```
+El ultimo valor por encima que no es outlier (9).
+El ultimo valor por debajo que no es outlier (0) (El tiempo no puede ser negativo).
+
+```{r}
+length(filter(data,Tenure<0)$Tenure)
+
+```
+Se observa que por debajo, no hay outliers.
+
+```{r}
+length(filter(data,Tenure>9)$Tenure)
+
+
+```
+Se observa que por arriba, hay 490 outliers.
+
+Balance      : Indica la totalidad de la deuda que le queda por pagar a cada cliente. Variable cuantitativa, continua ("num")
 
 ```{r}
 summary(data$Balance)
@@ -215,8 +292,31 @@ ggplot(Bal,aes(Balance))+geom_boxplot()
 ggplot(Bal,aes(Balance))+geom_density()
 ggplot(Bal,aes(Balance))+geom_histogram()
 ```
+```{r}
+ks.test(data$Balance, "pnorm")
+```
+El p-value=0, menor a 0.05, rechazamos la hipotesis nula. Por tanto, nuestros datos no siguen una distribucion normal
+
+```{r}
+IQR_Balance<-IQR(data$Balance)
+Outliersup_Balance<-quantile(data$Balance, prob=c(0.25))+1.5*IQR_Balance;Outliersup_Balance
+Outliersdown_Balance<-quantile(data$Balance, prob=c(0.25))-1.5*IQR_Balance;Outliersdown_Balance
+```
+El ultimo valor por encima que no es outlier (191466.4).
+El ultimo valor por debajo que no es outlier (0) (La deuda no puede ser negativa).
+
+```{r}
+length(filter(data,Balance<0)$Balance)
+
+```
+Se observa que por debajo, no hay outliers.
+
+```{r}
+length(filter(data,Balance>191466.4)$Balance)
 
 
+```
+Se observa que por encima, hay 59 outliers.
 
 NumOfProducts : Indica la cantidad de productos bancarios de cada cliente. Variable cuantitativa discreta ("int").
 
@@ -228,21 +328,88 @@ ggplot(data,aes(NumOfProducts))+geom_boxplot()
 ggplot(data,aes(NumOfProducts))+geom_density()
 ggplot(data,aes(NumOfProducts))+geom_histogram()
 ```
-
-HasCrCard       : Indica si el cliente tiene o no Tarjeta de Credito del banco. Variable cualitativa, nominal. Si bien se importa como tipo "int", se transformara a tipo factor dado que .
+```{r}
+ks.test(data$NumOfProducts, "pnorm")
+```
+El p-value=0, menor a 0.05, rechazamos la hipotesis nula. Por tanto, nuestros datos no siguen una distribucion normal.
 
 ```{r}
-data$HasCrCard <- factor(data$HasCrCard,labels = c("No","Yes"), levels = c(0,1))
-str(data$HasCrCard)
+IQR_NumOfProducts<-IQR(data$NumOfProducts)
+Outliersup_NumOfProducts<-quantile(data$NumOfProducts, prob=c(0.25))+1.5*IQR_NumOfProducts;Outliersup_NumOfProducts
+Outliersdown_NumOfProducts<-quantile(data$NumOfProducts, prob=c(0.25))-1.5*IQR_NumOfProducts;Outliersdown_NumOfProducts
 ```
-IsActiveMember 
-EstimatedSalary: 
-Exited    
+El ultimo valor por encima que no es outlier (2.5).
+El ultimo valor por debajo que no es outlier (0) (Los productos contratados no pueden ser negativos).
+
+```{r}
+length(filter(data,NumOfProducts<0)$NumOfProducts)
+
+```
+Se observa que por debajo, no hay outliers.
+
+```{r}
+length(filter(data,NumOfProducts>2.5)$NumOfProducts)
 
 
+```
+Se observa que por encima hay 326 outliers.
+
+HasCrCard       : Indica si el cliente tiene o no Tarjeta de Credito del banco. Variable cualitativa, nominal. Si bien se importa como tipo "int", se transformara a tipo factor.
+
+```{r}
+data$HasCrCard <- factor(data$HasCrCard)
+str(data$HasCrCard)
+summary(data$HasCrCard)
+table(data$HasCrCard)
+ggplot(data,aes(HasCrCard))+geom_bar()
+
+```
+```{r}
+
+ks.test(data$HasCrCard, "pnorm")
+```
+El p-value=0, menor a 0.05, rechazamos la hipotesis nula. Por tanto, nuestros datos no siguen una distribucion normal.
+
+IsActiveMember: Indica si el cliente tiene o no una cuenta activa en el banco. Variable cualitativa, nominal. Si bien se importa como tipo "int", se transformara a tipo factor.
+
+```{r}
+data$IsActiveMember <- factor(data$IsActiveMember)
+str(data$IsActiveMember)
+summary(data$IsActiveMember)
+table(data$IsActiveMember)
+ggplot(data,aes(IsActiveMember))+geom_bar()
+```
+
+EstimatedSalary: : Indica el salario de cada cliente. Variable cuantitativa, continua ("num")
+
+```{r}
+summary(data$EstimatedSalary)
+ggplot(data,aes(EstimatedSalary))+geom_boxplot()
+```
+```{r}
+ks.test(data$EstimatedSalary, "pnorm")
+```
+El p-value=0, menor a 0.05, rechazamos la hipotesis nula. Por tanto, nuestros datos no siguen una distribucion normal.
+```{r}
+IQR_EstimatedSalary<-IQR(data$EstimatedSalary)
+Outliersup_EstimatedSalary<-quantile(data$EstimatedSalary, prob=c(0.25))+1.5*IQR_EstimatedSalary;Outliersup_EstimatedSalary
+Outliersdown_EstimatedSalary<-quantile(data$EstimatedSalary, prob=c(0.25))-1.5*IQR_EstimatedSalary;Outliersdown_EstimatedSalary
+```
+El ultimo valor por encima que no es outlier (198581.3).
+El ultimo valor por debajo que no es outlier (0) (El salario no pueden ser negativo).
+
+```{r}
+length(filter(data,EstimatedSalary<0)$EstimatedSalary)
+
+```
+Se observa que por debajo, no hay outliers.
+
+```{r}
+length(filter(data,EstimatedSalary>198581.3 )$EstimatedSalary)
 
 
-
+```
+Se observa que por encima hay 75 outliers.
 
 
 
