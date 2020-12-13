@@ -24,6 +24,12 @@ library(DescTools) #Herramientas para estadística descriptiva y análisis de da
 library(psych) #Herramientas de entrada de datos y análisis descriptivo.
 library(scales) #Herramienta complemento de "ggplot2"
 library (reshape2) #Para uso de función melt()
+
+
+
+
+library(ggpubr)
+
 ```
 
 Durante todo el analisis se trabaja con la base de datos suministrada "`Dataset_Compradores.csv`", la cual, para su estandarizacion, se extrae desde URL. Ademas, por indicaciones durante clase, la ultima variable `Exited` no se  tiene en cuenta.
@@ -118,7 +124,7 @@ dat_long = melt(dat);glimpse(dat_long)
 ```
 Para las variables cuantitativas, se indican los estadisticos basicos, al igual que la visualizacion de la dispersion y centralidad:
 
-```{r,fig.height = 4.5, message=FALSE}
+```{r num ,fig.height = 4.5, message=FALSE}
 dat %>% 
   select(starts_with("cu")) %>% 
   summary.data.frame()
@@ -133,6 +139,8 @@ dat %>%
 
 ## Grafica
 
+
+##* Box
 dat_long %>% 
   ggplot(aes(variable, value,fill=variable))+
   geom_boxplot()+
@@ -144,15 +152,21 @@ dat_long %>%
   theme_bw()+
   theme(legend.position='none')
 
+
+##* Density
 dat_long %>% 
-  ggplot(aes(variable, value,fill=variable))+
-  geom_boxplot()+
-  geom_point(data=dat_long %>% 
+  select(variable,value) %>% 
+  ggplot(aes(value,group=variable,fill=variable, alpha=0.7))+
+  geom_density(kernel = "gaussian")+
+  
+  geom_vline(data = dat_long %>%
                group_by(variable) %>% 
-               summarise(mean= mean(value)), 
-             aes(variable,mean), shape=8)+
+               summarise(mean= mean(value)),
+             aes(xintercept = mean))+
+  
   facet_wrap(.~variable, scales = "free")+
   theme_bw()+
+<<<<<<< HEAD
   theme(legend.position='none')
 ```
 
@@ -162,8 +176,16 @@ Nuevamente, no se identifican valores NaN. Mas adelante se profundizara en los e
 
 En cuanto a las variables categoricas: 
 
-```{r summ cat,fig.height = 4.5, message=FALSE}
+=======
+  theme(legend.position='top')
+```
 
+Nuevamente, no se identifican valores NaN. Mas adelante se profundizará en los estadisticos.
+
+En cuanto a las variables categóricas: 
+
+>>>>>>> 9f00a6aa66611583a6c3f942996e7619b15d0f4e
+```{r summ cat,fig.height = 4.5, message=FALSE}
 ##* Frecuencias
 dat %>% 
   select(starts_with("ca") & !ca_Surname) %>% 
@@ -171,6 +193,7 @@ dat %>%
 ```
 De esta manera, se  pueden conocer los valores y frecuencias de cada una de las variables categoricas. Ademas, cada observacion/fila tiene un `CustomerId` unico (es decir, datos de clientes diferentes) y en ningun caso se identifican entradas NaN.
 
+<<<<<<< HEAD
 ## **3. Llevar a cabo un analisis estadistico en R e interpretar los resultados**
 
 ##### **Realizar un analisis de comparacion, siendo la hipotesis inicial: El salario de los consumidores es igual en los diferentes paises donde se han recogido los datos**
@@ -190,6 +213,94 @@ medias<-dat %>%
   group_by(ca_Geography) %>% 
   summarise(mean=mean(cu_EstimatedSalary))
 ```
+=======
+```{r fq cate, fig.height = 4.4, fig.width =8}
+
+##* Geography
+plot_Geo <-dat %>% 
+  count(ca_Geography) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_Geography,n,label= prop,fill= ca_Geography)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()+
+  scale_fill_manual("", values = c("France" = "#c90000", 
+                                   "Germany" = "#eb9100", 
+                                   "Spain" = "#fff700"))+
+  theme(legend.position='none')
+
+##* Gender
+plot_Gender <-dat %>% 
+  count(ca_Gender) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_Gender,n,label= prop,fill= ca_Gender)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()+
+  theme(legend.position='none')
+
+##* IsActiveMember
+plot_Act <-dat %>% 
+  count(ca_IsActiveMember) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_IsActiveMember,n,label= prop,
+             fill=ca_IsActiveMember)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()  + 
+  scale_fill_manual("", values = c("0" = "#e00000", 
+                                   "1" = "#087d00"))+
+  theme(legend.position='none')
+
+##* HasCrCard
+plot_HCre <-dat %>% 
+  count(ca_HasCrCard) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_HasCrCard,n,label= prop,fill= ca_HasCrCard)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()+
+  scale_fill_manual("", values = c("0" = "#e00000", 
+                                 "1" = "#087d00"))+
+  theme(legend.position='none')
+
+##* CreditCat
+plot_CrCat <-dat %>% 
+  count(ca_CreditCat) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_CreditCat,n,label= prop,fill= ca_CreditCat)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()+
+  theme(legend.position='none')
+
+
+##* Visualización
+
+ggarrange(plot_Geo, plot_CrCat,
+          ncol = 2, nrow = 1)
+
+ggarrange(plot_Gender, plot_Act, plot_HCre,
+          ncol = 3, nrow = 1)
+
+```
+
+De esta manera, se  puede conocer los valores y frecuencias de cada una de las variables categóricas. Además, cada observación/fila tiene un `CustomerId` único (es decir, datos de clientes diferentes) y en ningún caso se identificaron entradas NaN.
+
+
+
+
+>>>>>>> 9f00a6aa66611583a6c3f942996e7619b15d0f4e
 ```{r}
 ggplot(dat, aes(ca_Geography,cu_EstimatedSalary,fill=ca_Geography))+
   geom_boxplot()+

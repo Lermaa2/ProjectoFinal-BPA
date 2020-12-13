@@ -1,0 +1,78 @@
+
+dat %>% 
+  select(starts_with("cu")) %>% 
+  summary.data.frame()
+## Mas estadisticos básicos
+dat %>% 
+  select(starts_with("cu")) %>% 
+  describe()
+
+
+
+
+
+dat_long %>% 
+  select(variable,value) %>% 
+  group_by(variable) %>% 
+  mutate (ks_pval = ks.test(value,"pnorm")$.pavlue)
+
+
+library(tibble)
+library(dplyr)
+
+# Create a data set of 1,000 random values in 100 subgroups with sample size 10
+contrived_data <- tibble(subgroup = rep(1:100, each = 10),
+                         value    = rnorm(1000, mean = 5, sd = 1))
+glimpse(contrived_data)
+
+# Run the KS test vs. normal distribution on each sample of size 10. Return the KS statistic and p-value
+# into new tibble columns
+contrived_data %>% 
+  group_by(subgroup) %>%
+  summarize(avg     = mean(value),
+            std_dev = sd(value),
+            ks_stat = ks.test(value, "pnorm", mean = 5, sd = 1)$statistic,
+            ks_pval = ks.test(value, "pnorm", mean = 5, sd = 1)$p.value)
+
+
+
+
+
+
+
+
+
+## Grafica
+
+
+##* Box
+dat_long %>% 
+  ggplot(aes(variable, value,fill=variable))+
+  geom_boxplot()+
+  geom_point(data=dat_long %>% 
+               group_by(variable) %>% 
+               summarise(mean= mean(value)), 
+             aes(variable,mean), shape=8)+
+  facet_wrap(.~variable, scales = "free")+
+  theme_bw()+
+  theme(legend.position='none')
+
+
+##* Density
+dat_long %>% 
+  select(variable,value) %>% 
+  ggplot(aes(value,group=variable,fill=variable, alpha=0.7))+
+  geom_density(kernel = "gaussian")+
+  
+  geom_vline(data = dat_long %>%
+               group_by(variable) %>% 
+               summarise(mean= mean(value)),
+             aes(xintercept = mean))+
+  
+  facet_wrap(.~variable, scales = "free")+
+  theme_bw()+
+  theme(legend.position='top')
+
+
+
+

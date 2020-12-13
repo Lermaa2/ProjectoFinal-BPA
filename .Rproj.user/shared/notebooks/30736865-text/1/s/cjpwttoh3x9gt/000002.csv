@@ -1,8 +1,8 @@
-"0","##* Frecuencias
-dat %>% 
-  select(starts_with(""ca"") & !ca_Surname) %>% 
-  summary()
-"
+"0",""
+"0","##* Frecuencias"
+"0","dat %>% "
+"0","  select(starts_with(""ca"") & !ca_Surname) %>% "
+"0","  summary()"
 "1",""
 "1","  ca_CustomerId "
 "1","  ca_Geography "

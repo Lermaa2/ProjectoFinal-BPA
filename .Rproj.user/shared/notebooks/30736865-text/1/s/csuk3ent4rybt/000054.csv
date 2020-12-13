@@ -1,5 +1,7 @@
 "0","## Grafica"
 "0",""
+"0",""
+"0","##* Box"
 "0","dat_long %>% "
 "0","  ggplot(aes(variable, value,fill=variable))+"
 "0","  geom_boxplot()+"
