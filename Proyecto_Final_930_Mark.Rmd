@@ -69,7 +69,11 @@ x[c("vars","n","max","min")]
 
 Se puede notar que existen 10000 observaciones y 14 variables, guardadas en un objeto tipo DataFrame.
 
+Estas se resumen de la siguiente manera:
 
+RowNumber   : Corresponde al Indice de las entradas. Variable categorica ("int").
+
+CustomerId  : Identifiación del cliente, Variable tipo cuantitativa discreta ("int").
 
 ```{r}
 data.frame( Datos_unicos_CustomerId=length(unique(data$CustomerId) ),
@@ -141,6 +145,7 @@ Al ser nuestro p-value=2.2e-16 ~ 0, menor a 0.05, rechazamos la hipotesis nula. 
 
 ```{r}
 IQR_CS<-IQR(data$CreditScore)
+summary(data$CreditScore)
 Outliersup_CS<-quantile(data$CreditScore, prob=c(0.25))+1.5*IQR_CS;Outliersup_CS
 Outliersdown_CS<-quantile(data$CreditScore, prob=c(0.25))-1.5*IQR_CS;Outliersdown_CS
 ```
@@ -406,6 +411,28 @@ length(filter(data,EstimatedSalary>198581.3 )$EstimatedSalary)
 
 ```
 Se observa que por encima hay 75 outliers.
+
+3) Lleva a cabo un analisis estadiscitco en R y saber interpretar los resultados
+a) Realizar un analisis de comparacion, siendo la hipotesis inicial:
+el salario de los consumidores es igual en los diferentes paises donde se han recogido los datos" 
+```{r}
+box<-ggplot(data,aes(x=Geography,y=EstimatedSalary))+geom_boxplot()
+box
+```
+```{r}
+EstiS<-data$EstimatedSalary
+EstiS_fr<-data %>% filter(Geography=="France") %>% select()
+Geo<-data$Geography;
+France<-filter(data,Geography=="France")
+Germany<-filter(data,Geography=="Germany")
+Spain<-filter(data,Geography=="Spain")
+
+var.test(EstiS ~ data$Geography=="Germany")
+
+t.test(EstiS ~ data$Geography=="Germany",
+       var.equal=F,
+       conf.level = 0.95)
+```
 
 
 
