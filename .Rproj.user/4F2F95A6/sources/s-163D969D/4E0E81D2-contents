@@ -19,6 +19,12 @@ library(DescTools) #Herramientas para estadística descriptiva y análisis de da
 library(psych) #Herramientas de entrada de datos y análisis descriptivo.
 library(scales) #Herramienta complemento de "ggplot2"
 library (reshape2) #Para uso de función melt()
+
+
+
+
+library(ggpubr)
+
 ```
 
 Se trabajara con la base de datos suministrada "`Dataset_Compradores.csv`", la cual, para estandarización, se extrae desde url. Además, por indicaciones durante clase, la ultima variable `Exited` no se tomará en cuenta, por lo que resulta:
@@ -115,7 +121,7 @@ dat_long = melt(dat);glimpse(dat_long)
 ```
 Para las variables cuantitativas, se indican los estadisticos básicos inicialmente, al igual como visualización de la dispersión y centralidad:
 
-```{r,fig.height = 4.5, message=FALSE}
+```{r num ,fig.height = 4.5, message=FALSE}
 dat %>% 
   select(starts_with("cu")) %>% 
   summary.data.frame()
@@ -130,6 +136,8 @@ dat %>%
 
 ## Grafica
 
+
+##* Box
 dat_long %>% 
   ggplot(aes(variable, value,fill=variable))+
   geom_boxplot()+
@@ -141,95 +149,118 @@ dat_long %>%
   theme_bw()+
   theme(legend.position='none')
 
+
+##* Density
 dat_long %>% 
-  ggplot(aes(variable, value,fill=variable))+
-  geom_boxplot()+
-  geom_point(data=dat_long %>% 
+  select(variable,value) %>% 
+  ggplot(aes(value,group=variable,fill=variable, alpha=0.7))+
+  geom_density(kernel = "gaussian")+
+  
+  geom_vline(data = dat_long %>%
                group_by(variable) %>% 
-               summarise(mean= mean(value)), 
-             aes(variable,mean), shape=8)+
+               summarise(mean= mean(value)),
+             aes(xintercept = mean))+
+  
   facet_wrap(.~variable, scales = "free")+
   theme_bw()+
-  theme(legend.position='none')
-
-
-
-
+  theme(legend.position='top')
 ```
-
 
 Nuevamente, no se identifican valores NaN. Mas adelante se profundizará en los estadisticos.
 
-
-
 En cuanto a las variables categóricas: 
 
-
 ```{r summ cat,fig.height = 4.5, message=FALSE}
-
 ##* Frecuencias
 dat %>% 
   select(starts_with("ca") & !ca_Surname) %>% 
   summary()
 ```
 
+```{r fq cate, fig.height = 4.4, fig.width =8}
+
+##* Geography
+plot_Geo <-dat %>% 
+  count(ca_Geography) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_Geography,n,label= prop,fill= ca_Geography)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()+
+  scale_fill_manual("", values = c("France" = "#c90000", 
+                                   "Germany" = "#eb9100", 
+                                   "Spain" = "#fff700"))+
+  theme(legend.position='none')
+
+##* Gender
+plot_Gender <-dat %>% 
+  count(ca_Gender) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_Gender,n,label= prop,fill= ca_Gender)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()+
+  theme(legend.position='none')
+
+##* IsActiveMember
+plot_Act <-dat %>% 
+  count(ca_IsActiveMember) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_IsActiveMember,n,label= prop,
+             fill=ca_IsActiveMember)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()  + 
+  scale_fill_manual("", values = c("0" = "#e00000", 
+                                   "1" = "#087d00"))+
+  theme(legend.position='none')
+
+##* HasCrCard
+plot_HCre <-dat %>% 
+  count(ca_HasCrCard) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_HasCrCard,n,label= prop,fill= ca_HasCrCard)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()+
+  scale_fill_manual("", values = c("0" = "#e00000", 
+                                 "1" = "#087d00"))+
+  theme(legend.position='none')
+
+##* CreditCat
+plot_CrCat <-dat %>% 
+  count(ca_CreditCat) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_CreditCat,n,label= prop,fill= ca_CreditCat)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()+
+  theme(legend.position='none')
 
 
+##* Visualización
 
+ggarrange(plot_Geo, plot_CrCat,
+          ncol = 2, nrow = 1)
+
+ggarrange(plot_Gender, plot_Act, plot_HCre,
+          ncol = 3, nrow = 1)
+
+```
 
 De esta manera, se  puede conocer los valores y frecuencias de cada una de las variables categóricas. Además, cada observación/fila tiene un `CustomerId` único (es decir, datos de clientes diferentes) y en ningún caso se identificaron entradas NaN.
 
 
-
-
-Se continua con la exploración de los datos de cada variable. Para ello, se comenzará con proporciones de cada variable categorica independiente y posterior como se distribuye las variables cuantitativas respecto a unicamente esta (inicialmente.)
-
-
-para `Geography`:
-```{r ,fig.height = 3}
-
-##* Tabla
-dat %>% 
-  count(ca_Geography) %>% 
-  mutate(prop = percent(prop.table(n))) 
-
-##* Grafica
-dat %>% 
-  count(ca_Geography) %>% 
-  mutate(prop = percent(prop.table(n))) %>% 
-  ggplot(aes(ca_Geography,n,label= prop,fill= ca_Geography)) +
-  geom_col()+
-  geom_text(check_overlap = TRUE,
-            position = position_stack(vjust = 0.5))
-
-
-##* values ~ Geography
-
-dat_long %>% 
-  select(ca_Geography,variable,value) %>% 
-  group_by(ca_Geography) %>% 
-  mutate( mean = mean(value))
-
-
-
-```
-
-
-
-
-y algunos de los estadisticos básicos de centralidad y dispersión para las variables cuantitativas.  
-
-```{r}
-
-
-glimpse(dat)
-
-dat%>% 
-  describe
-
-
-
-```
 
 
 ```{r}

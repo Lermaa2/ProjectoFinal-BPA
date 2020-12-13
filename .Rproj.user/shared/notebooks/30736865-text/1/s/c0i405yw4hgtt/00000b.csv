@@ -1,2 +1,0 @@
-"0","var_cuant_cont <- data %>% select(Balance,"
-"0","                                  EstimatedSalary);head(var_cuant_cont)"
