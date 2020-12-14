@@ -9,8 +9,5 @@
 "0","            position = position_stack(vjust = 0.5),"
 "0","            size=3)+"
 "0","  theme_bw()+"
-"0","  scale_fill_manual("""", values = c(""France"" = ""#c90000"", "
-"0","                                   ""Germany"" = ""#eb9100"", "
-"0","                                   ""Spain"" = ""#fff700""))+"
 "0","  theme(legend.position='none')+"
 "0","  scale_fill_jco()"

@@ -3,22 +3,22 @@
     "path": "C:/Users/jaime/OneDrive/EAE/_Cheat Sheets-Scripts/Cheat-Sheets-Scripts/Cheat Script - R.R",
     "project_path": null,
     "type": "r_source",
-    "hash": "1523608374",
+    "hash": "137139437",
     "contents": "",
     "dirty": false,
     "created": 1607501891315.0,
     "source_on_save": false,
     "relative_order": 1,
     "properties": {
-        "cursorPosition": "9,0",
+        "cursorPosition": "9,76",
         "scrollLine": "0"
     },
-    "folds": "13|3|105|4|\n142|1|595|2|\n597|19|1134|14|\n599|1|1132|0|\n1787|1|1874|0|\n",
-    "lastKnownWriteTime": 1607919759,
+    "folds": "14|3|106|4|\n116|1|566|2|\n117|15|142|4|\n143|23|231|4|\n232|33|251|4|\n252|36|277|4|\n278|23|355|4|\n356|19|366|4|\n367|23|392|4|\n393|43|489|4|\n490|26|565|4|\n571|15|587|2|\n588|25|610|2|\n611|28|619|2|\n620|38|641|2|\n642|36|648|2|\n649|56|675|2|\n676|55|692|2|\n693|52|699|2|\n700|62|712|2|\n713|48|725|2|\n726|46|744|2|\n745|33|754|2|\n755|30|768|2|\n769|21|789|2|\n790|38|802|2|\n803|56|835|2|\n836|54|845|2|\n846|62|851|2|\n1106|19|1753|0|\n1109|1|1359|0|\n1756|1|1770|0|\n1774|1|1861|0|\n",
+    "lastKnownWriteTime": 1607971004,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1607919759985,
+    "last_content_update": 1607971004843,
     "read_only": false,
     "read_only_alternatives": []
 }

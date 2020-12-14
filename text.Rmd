@@ -32,101 +32,17 @@ library(ggsci) #Paletas de colores para graficos
 library(corrplot)
 ```
 
-Durante todo el análisis se trabaja con la base de datos suministrada "`Dataset_Compradores.csv`", la cual, para su estandarización, se extrae desde URL. Además, por indicaciones durante clase, la última variable `Exited` no se tiene en cuenta.
 
-```{r datos}
 
-data_ori <- read.csv("https://raw.githubusercontent.com/Lermaa2/ProjectoFinal-BPA/68c182ad59e0039875994b11acfcd40a66949acd/Dataset_Compradores.csv"
-                 ,dec=".")
 
-dat <- data_ori[2:13]; glimpse(dat);tail(dat[,1:4])
 
-```
 
-Se observa que existen 10000 entradas, no existen ni notas ni pie de páginas que puedan requerir ser eliminados antes del análisis. 
 
-## **2. Descripción de variables**
 
-Se indica el tipo de dato/variable con el que se trabaja, agrupándolas en dos grupos:
 
-##### **Categóricas/Cualitativas:**
+##### **"la edad predice la solvencia (credit score) de los consumidores"**
 
-* `CustomerId`      : Identificación del cliente. Se transforma a factor. (`factor`/nominal).
-
-* `Surname`         : Apellido de los clientes. Se transforma a factor. (`factor`/nominal).
-
-* `Geography`       : País de origen de cada cliente. Se transforma a factor. (`factor`/nominal)
-
-* `Gender`         : Genero de cada cliente. Se transforma a factor. (`factor`/nominal)
-
-* `HasCrCard`       : Posee/ No posee (1/0) Tarjeta de Crédito. Se transforma a factor. (`factor``/nominal).
-
-* `IsActiveMember`  : Indica si el cliente esta/no está (1/0) activo en la entidad. 
-
-Todas se transforman a factor (`factor`/nominal).
-
-##### **Cuantitativas: **
-
-* `Age`             : Edad del cliente. (`int`/discreta).
-
-* `Tenure`          : Meses restantes para el pago total de la deuda. (`int`/discreta).
-
-* `CreditScore`     : Score de Crédito, valoración de cada cliente basado en su historial crediticio. (`int`/discreta).
-
-* `EstimatedSalary` : Salario estimado del cliente. (`num`/continua).
-
-* `Balance`         : Deuda pendiente de pago. (`num`/continua).
-
-* `NumOfProducts`   : Productos bancarios de cada cliente. (`int`discreta).
-
-El valor `CreditScore` se usa para asignar niveles a los clientes que dependen del modelo de cada banco, pero se suele usar:
-
-* 350 ~ 579 - `poor`
-
-* 580 ~ 669 - `fair`
-
-* 670 ~ 739 - `good` 
-
-* 740 ~ 799 - `very_good`
-
-* Mayor que 800 - `excellent`
-
-Para el análisis, se decide agregar la variable categórica `CreditCat` (`ord`/ordinal). Adicional a los cambios de clase mencionados, se busca conocer si existen valores nulos o NA:
-
-```{r data, warning=FALSE, message = FALSE}
-dat <-  data_ori[2:13] %>% 
-  mutate( CreditCat= case_when(CreditScore < 580 ~ 1,
-        CreditScore >= 580 & CreditScore < 669 ~ 2,
-        CreditScore >= 669 & CreditScore < 739 ~ 3,
-        CreditScore >= 739 & CreditScore < 799 ~ 4,
-        CreditScore >= 799 ~ 5,
-        TRUE ~ 0)) %>% 
-  select(CustomerId,Surname,Geography,Gender, 
-         IsActiveMember, HasCrCard, CreditCat,
-         CreditScore, Age, Balance,
-         EstimatedSalary, Tenure, NumOfProducts) %>% 
-  mutate(across(c(CustomerId,
-                  Surname,
-                  Geography,
-                  Gender,
-                  IsActiveMember,
-                  HasCrCard,
-                  CreditCat),
-                factor)) %>% 
-  rename_if(is.numeric,~paste("cu",.x,sep = "_") ) %>% 
-  rename_if(negate(is.numeric),~paste("ca",.x,sep = "_") )
-##* Para `CreditCat`:
-dat$ca_CreditCat <- factor(dat$ca_CreditCat, 
-                        labels = c("poor", "fair",
-                                   "good", "very_good",
-                                   "excellent"),ordered = T);glimpse(dat)
-##* Se da formato canónico a la tabla de datos, es decir, se muestra una fila para cada valor observado (medido). Útil para futuras manipulaciones.
-dat_long = melt(dat);glimpse(dat_long)
-```
-
-**"la edad predice la solvencia (credit score) de los consumidores"**
-
-Para ello, se trabajrá con las siguientes hipotesis: 
+Para ello, se trabajará con las siguientes hipótesis: 
 
 H~0~= No existe correlación lineal entre la edad del cliente y el Credit Score.
 
@@ -134,25 +50,17 @@ H~a~= Existe correlación lineal entre la edad del cliente y el Credit Score.
 
 Inicialmente se realiza una inspección grafica entre las variables (ambas cuantitativas discretas), siendo `Age` la variable independiente y `CreditScore` la dependiente (a predecir):
 
-```{r, message=FALSE, out.width=c('50%', '50%'), fig.show='hold', warning= FALSE}
+```{r, message=FALSE, fig.show='hold', warning= FALSE}
 
-## Solos
-
-dat %>%
-  ggplot(aes(cu_Age, cu_CreditScore))+
-  geom_jitter(alpha=0.5)+
-  geom_smooth(method = lm)
+## cu_Age vs cu_CreditScore
 
 dat %>%
   ggplot(aes(cu_Age, cu_CreditScore))+
-  geom_count(alpha=0.5)+
+  geom_count(alpha=0.3)+
   geom_smooth(method = lm)
-
-
-
 ```
 
-Se observa preliminarmente que no existe relación lineal entre estas. Sin embargo, se confirma con test de correlacion (Pearson y Spearman) y regresión lineal:
+Se observa preliminarmente que no existe relación lineal entre estas. Sin embargo, se confirma con test de correlación (Pearson y Spearman) y regresión lineal:
 
 ```{r, message=FALSE, out.width=c('50%', '50%'), fig.show='hold', warning= FALSE}
 ## Pearson's product-moment correlation
@@ -168,16 +76,85 @@ summary(lm(dat$cu_CreditScore ~ dat$cu_Age))
 
 En todos los test el p-value es mayor que 0.05, por lo que no se rechaza la H~0~ (Pearson's/Spearman's: R=0 , lm: B1 = 0)
 
-Se busca entonces que otras variables si pudieran estar relacionadas para predecir el `CreditScore`:
+Debido a esto, se busca separar los datos entre las variables categóricas y observar si cambia la relación:
 
-```{r}
+Por `Geography`:
+
+```{r fig.show='hold', message=FALSE, warning=FALSE}
+## Geography
+
+dat %>%
+  ggplot(aes(cu_Age, cu_CreditScore, color=ca_Geography))+
+  geom_count(alpha=0.3)+
+  facet_grid(ca_Geography ~ .)+  
+  geom_smooth(method = lm)+
+  theme(legend.position='bottom') + 
+  scale_color_jco()
+
+```
+
+Por `Gender`:
+
+```{r message=FALSE, warning=FALSE}
+## Gender
+
+dat %>%
+  ggplot(aes(cu_Age, cu_CreditScore, color=ca_Gender))+
+  geom_count(alpha=0.3)+
+  facet_grid(ca_Gender ~ .)+  
+  geom_smooth(method = lm)+
+  theme(legend.position='bottom') + 
+  scale_color_npg()
+
+```
+
+Por `IsActiveMember`:
+ 
+```{r message=FALSE, warning=FALSE, , fig.show='hold'}
+
+## IsActiveMember
+dat %>%
+  ggplot(aes(cu_Age, cu_CreditScore, color=ca_IsActiveMember))+
+  geom_count(alpha=0.3)+
+  facet_grid(ca_IsActiveMember ~ .)+  
+  geom_smooth(method = lm)+
+  theme(legend.position='bottom') + 
+  scale_colour_manual("", values = c("0" = "#d62727", 
+                                   "1" = "#2ca02c"))
+
+```
+
+Por `HasCrCard`:
+
+```{r message=FALSE, warning=FALSE, , fig.show='hold'}
+
+## HasCrCard
+dat %>%
+  ggplot(aes(cu_Age, cu_CreditScore, color=ca_HasCrCard))+
+  geom_count(alpha=0.3)+
+  facet_grid(ca_HasCrCard ~ .)+  
+  geom_smooth(method = lm)+
+  theme(legend.position='bottom') + 
+  scale_colour_manual("", values = c("0" = "#d62727", 
+                                   "1" = "#2ca02c"))
+
+```
+
+Visualmente es posible identificar que no hay relación significativa entre la edad y Credit Score entre cada una de las categorías.
+
+
+##### **EXTRA**
+
+Se busca entonces que otras variables cuantitativas si pudieran estar relacionadas con el `CreditScore`:
+
+```{r message=FALSE, warning=FALSE}
 dat %>% 
   select(starts_with("cu")) %>% 
-  cor()
-
-cor(as.numeric(dat))
+  cor() %>% 
+  round(2)
 ```
-```{r, out.width=c('50%', '50%'), fig.show='hold', warning= FALSE}
+
+```{r, fig.show='hold', warning= FALSE}
 
 dat %>% 
   select(starts_with("cu")) %>% 
@@ -187,58 +164,5 @@ dat %>%
 
 ```
 
-
-```{r, out.width=c('50%', '50%'), fig.show='hold', warning= FALSE}
-## Geography
-dat %>%
-  ggplot(aes(cu_Age, cu_CreditScore, color=ca_Geography))+
-  geom_jitter(alpha=0.5)+
-  facet_grid(ca_Geography ~ .)+  
-  geom_smooth(method = lm)+
-  theme(legend.position='none')
-
-dat %>%
-  ggplot(aes(cu_Age, cu_CreditScore, color=ca_Geography))+
-  geom_count(alpha=0.5)+
-  facet_grid(ca_Geography ~ .)+  
-  geom_smooth(method = lm)+
-  theme(legend.position='none')
-
-```
-
-
-```{r, out.width=c('50%', '50%'), fig.show='hold', warning= FALSE}
-
-
-## Gender
-  dat %>%
-  ggplot(aes(cu_Age, cu_CreditScore, color=ca_Gender))+
-  geom_jitter(alpha=0.5)+
-  facet_grid(ca_Gender ~ .)+  
-  geom_smooth(method = lm)+
-  theme(legend.position='none')
-
-
-dat %>%
-  ggplot(aes(cu_Age, cu_CreditScore, color=ca_Gender))+
-  geom_count(alpha=0.5)+
-  facet_grid(ca_Gender ~ .)+  
-  geom_smooth(method = lm)+
-  theme(legend.position='none')
-
-```
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
+Como se observa, no existe relación significativa a primera vista entre `CreditScore` y el resto de variables cuantitativas.
 

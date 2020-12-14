@@ -3,7 +3,7 @@
     "path": "C:/Users/jaime/OneDrive/EAE/Business Performance Analysis/ProjectoFinal-BPA/text.Rmd",
     "project_path": "text.Rmd",
     "type": "r_markdown",
-    "hash": "3803354072",
+    "hash": "1519430866",
     "contents": "",
     "dirty": false,
     "created": 1607953015750.0,
@@ -11,16 +11,16 @@
     "relative_order": 4,
     "properties": {
         "tempName": "Untitled1",
-        "cursorPosition": "187,0",
-        "scrollLine": "188",
+        "cursorPosition": "39,0",
+        "scrollLine": "20",
         "last_setup_crc32": ""
     },
-    "folds": "136|81|152|0|\n190|66|206|0|\n209|66|228|0|\n",
-    "lastKnownWriteTime": 1607956940,
+    "folds": "",
+    "lastKnownWriteTime": 1607977780,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1607956940905,
+    "last_content_update": 1607977781010,
     "read_only": false,
     "read_only_alternatives": []
 }

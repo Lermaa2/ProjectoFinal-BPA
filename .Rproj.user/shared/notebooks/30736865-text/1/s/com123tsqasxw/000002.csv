@@ -8,3 +8,4 @@
 "0","  theme_bw() +"
 "0","    theme(legend.position = ""right"")) ## Tema por defecto a los gráficos"
 "0","library(ggsci) #Paletas de colores para graficos"
+"0","library(corrplot)"
