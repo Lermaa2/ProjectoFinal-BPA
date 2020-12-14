@@ -1,0 +1,1912 @@
+
+
+
+
+library(tidyverse)
+library(lubridate)
+library(corrplot)
+library(psych) #Herramientas de entrada de datos y análisis descriptivo.
+library (reshape2) #Para uso de función melt()
+library(ggplot2);theme_set(
+  theme_minimal() +
+    theme(legend.position = "right"))
+https://www.datanovia.com/en/blog/ggplot-colors-best-tricks-you-will-love/
+  {
+    
+    custom.col <- c("#FFDB6D", "#C4961A", "#F4EDCA", 
+                    "#D16103", "#C3D7A4", "#52854C", "#4E84C4", "#293352")
+    
+    # The palette with grey:
+    cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
+              "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+    
+    # The palette with black:
+    cbp2 <- c("#000000", "#E69F00", "#56B4E9", "#009E73",
+              "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+    
+    # To use for fills, add
+    bp + scale_fill_manual(values = cbp2)
+    
+    # To use for line and point colors, add
+    sp + scale_colour_manual(values=cbp1)
+    
+    library(viridis)
+    # Gradient color
+    ggplot(iris, aes(Sepal.Length, Sepal.Width))+
+      geom_point(aes(color = Sepal.Length)) +
+      scale_color_viridis(option = "D")
+    
+    # Discrete color. use the argument discrete = TRUE
+    ggplot(iris, aes(Sepal.Length, Sepal.Width))+
+      geom_point(aes(color = Species)) +
+      geom_smooth(aes(color = Species, fill = Species), method = "lm") + 
+      scale_color_viridis(discrete = TRUE, option = "D")+
+      scale_fill_viridis(discrete = TRUE) 
+    
+    # Box plot
+    bp + scale_fill_brewer(palette = "Dark2")
+    
+    # Scatter plot
+    sp + scale_color_brewer(palette = "Dark2")
+    
+    library(RColorBrewer)
+    display.brewer.all(colorblindFriendly = TRUE)
+    
+    
+    # Box plot
+    bp + scale_fill_grey(start = 0.8, end = 0.2) 
+    
+    # Scatter plot
+    sp + scale_color_grey(start = 0.8, end = 0.2) 
+    
+    
+    library("ggsci")
+    # Change area fill color using jco palette
+    bp + scale_fill_jco()
+    
+    
+    # Change point color 
+    sp + scale_color_jco()
+    
+    library(wesanderson)
+    names(wes_palettes)
+    
+    library(wesanderson)
+    # Discrete color
+    bp + scale_fill_manual(values = wes_palette("GrandBudapest1", n = 3))
+    
+    # Gradient color
+    pal <- wes_palette("Zissou1", 100, type = "continuous")
+    ggplot(heatmap, aes(x = X2, y = X1, fill = value)) +
+      geom_tile() + 
+      scale_fill_gradientn(colours = pal) + 
+      scale_x_discrete(expand = c(0, 0)) +
+      scale_y_discrete(expand = c(0, 0)) + 
+      coord_equal() 
+    
+    sp2 <- ggplot(iris, aes(Sepal.Length, Sepal.Width))+
+      geom_point(aes(color = Sepal.Length)) 
+    # Sequential color scheme. 
+    # Specify the colors for low and high ends of gradient
+    sp2 + scale_color_gradient(low = "blue", high = "red")
+    
+    # Diverging color scheme
+    # Specify also the colour for mid point
+    mid <- mean(iris$Sepal.Length)
+    sp2 + scale_color_gradient2(midpoint = mid, low = "blue", mid = "white",
+                                high = "red", space = "Lab" )
+    
+    
+    sp2 + scale_color_gradientn(colours = rainbow(5))
+    
+    
+    
+    
+    
+    }
+
+
+
+
+
+
+
+
+
+
+library(ggpubr) ##
+
+
+
+
+library(DescTools) #Herramientas para estadística descriptiva y análisis de datos
+library(scales) #Herramienta complemento de "ggplot2"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+library(tidyverse)
+# Libreria tidyverse.  Incluye tidyr, dplyr, ggplot2, purrr, forcats 
+{
+# library(tidyr)  library(dplyr) ####
+library(tidyr)  library(dplyr)
+{
+  ##### Basics #####
+    
+  
+  
+  
+    #Para ejemplos.
+    
+    df <- data.frame(name=c("AAA", "BBB", "CCC", "DDD"), score = c(10, 10, 9, 8),
+                     gender = c(0, 1, 0, 1)); df
+    
+    tbl <- tbl_df(df); tbl
+    # Converts data to tbl class.
+    
+    glimpse(tbl)
+    #Information dense summary of tbl data. 
+    
+    View(tbl)
+    #View data set in spreadsheet-like display (note capital V).
+    
+    
+    %>%
+      #Passes object on lef hand side as first argument (or .
+      #argument) of function on righthand side
+      
+      iris %>%
+      group_by(Species) %>%
+      summarise(avg = mean(Sepal.Width)) %>%
+      arrange(avg)
+    
+  ##### Reshaping Data #####
+    
+    
+    
+    #NNOOO ENNTENDERRR
+    
+    
+    gather(cases, "year", "n", 2:4) 
+    gather(tbl,)
+    
+    
+    pivot_longer(tbl,!score)
+    pivot_longer(tbl,score)
+    #Gather columns into rows
+    
+    ### mirar pagina: https://tidyr.tidyverse.org/articles/pivot.html
+    
+    billboard %>%
+      pivot_longer(
+        cols = starts_with("wk"),
+        names_to = "week",
+        names_prefix = "wk",
+        names_transform = list(week = as.integer),
+        values_to = "rank",
+        values_drop_na = TRUE,
+      )
+    
+    billboard %>%
+      pivot_longer(
+        cols = starts_with("wk"),
+        names_to = "week",
+        names_transform = list(week = readr::parse_number),
+        values_to = "rank",
+        values_drop_na = TRUE,
+      )
+    
+    billboard %>%
+      pivot_longer(
+        cols = starts_with("wk"),
+        names_to = "week",
+        names_transform = list(week = readr::parse_number),
+        values_to = "rank",
+        values_drop_na = TRUE,
+      )
+    
+    who %>% pivot_longer(
+      cols = new_sp_m014:newrel_f65,
+      names_to = c("diagnosis", "gender", "age"),
+      names_pattern = "new_?(.*)_(.)(.*)",
+      names_transform = list(
+        gender = ~ readr::parse_factor(.x, levels = c("f", "m")),
+        age = ~ readr::parse_factor(
+          .x,
+          levels = c("014", "1524", "2534", "3544", "4554", "5564", "65"),
+          ordered = TRUE
+        )
+      ),
+      values_to = "count",
+    )
+    
+    separate(tbl, name, c("y", "m", "d"))
+    #Separate one column into several.
+    
+    spread(pollution, size, amount)
+    #Spread rows into columns.
+    
+    unite(data, col, ..., sep)
+    #Unite several columns into one.
+    
+    
+    
+    
+    #NNOOO ENNTENDERRR
+    
+    
+    
+    
+    data_frame(a = 1:3, b = 4:6)
+    #Combine vectors into data frame (optimized)
+    
+    arrange(tbl, score)
+    #Order rows by values of a column (low to high).
+    
+    arrange(tbl, desc(score))
+    #Order rows by values of a column (high to low). 
+    
+    rename(tbl, ans = gender)
+    #Rename the columns of a data frame.
+    
+  ##### Subset Observations ROWS #####
+    
+    filter(iris, Sepal.Length > 7)
+    #Extract rows that meet logical criteria.
+    
+    distinct(iris)
+    #Remove duplicate rows. 
+    
+    sample_frac(iris, 0.5, replace = TRUE)
+    #Randomly select fraction of rows.
+    
+    sample_n(iris, 10, replace = TRUE)
+    #Randomly select n rows.
+    
+    slice(tbl, 2:3)
+    #Select rows by position.
+    
+    top_n(tbl, 2, score)
+    #Select and order top n entries (by group if grouped data).
+    
+  ##### Subset Observations COLUMNS #####
+    
+    select(tbl, gender, name, score)
+    #Select columns by name or helper function.
+    
+    ##### Helper functions for select
+    
+    select(iris, contains("."))
+    #Select columns whose name contains a character string.
+    select(iris, ends_with("Length"))
+    #Select columns whose name ends with a character string.
+    select(iris, everything())
+    #Select every column.
+    select(iris, matches(".t."))
+    #Select columns whose name matches a regular expression.
+    select(iris, num_range("x", 1:5))
+    #Select columns named x1, x2, x3, x4, x5.
+    select(iris, one_of(c("Species", "Genus")))
+    #Select columns whose names are in a group of names.
+    select(iris, starts_with("Sepal"))
+    #Select columns whose name starts with a character string.
+    select(tbl, Sepal.Length:Petal.Width)
+    #Select all columns between Sepal.Length and Petal.Width (inclusive).
+    select(tbl, -score)
+    #Select all columns except Species
+    
+  ##### Summarise Data #####
+    
+    summarise(tbl, avg = mean(score))
+    # Summarise data into single row of values.
+    
+    summarise_each(tbl, funs(mean))
+    # Apply summary function to each column    OLD -> across
+    
+    starwars %>% 
+      group_by(homeworld) %>% 
+      filter(n() > 1) %>% 
+      summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE)))
+    
+    
+    tbl %>%
+      group_by(gender) %>%
+      summarise(across(starts_with("sc"), mean))
+    #Transformation to multiple columns
+    
+    
+    count(iris, Species, wt = Sepal.Length)
+    count(tbl, gender, wt = score)
+    count(tbl, gender)
+    # Count number of rows with each unique value of 
+    # variable (with or without weights).
+    
+    
+    # Summarise uses summary functions, functions that
+    # take a vector of values and return a single value, such as:
+    
+    
+    
+    first(tbl)
+    summarise_each(tbl, funs(first))
+    # First value of a vector
+    
+    last(tbl)
+    summarise_each(tbl, funs(last))
+    #Last value of a vector.
+    
+    nth(tbl,2)
+    #Nth value of a vector
+    
+    n
+    summarise_each(tbl, funs(n()))
+    # of values in a vector
+    
+    n_distinct
+    summarise_each(tbl, funs(n_distinct))
+    # of distinct values in a vector
+    
+    IQR
+    # IQR of a vector
+    
+    min
+    summarise_each(tbl, funs(min))
+    #Minimum value in a vector.
+    
+    max
+    summarise_each(tbl, funs(max))
+    #Maximum value in a vector
+    
+    mean
+    summarise_each(tbl, funs(mean))
+    #Mean value of a vector
+    
+    median
+    summarise_each(tbl, funs(median))
+    #Median value of a vector
+    
+    var
+    summarise_each(tbl, funs(var))
+    #Variance of a vector. 
+    
+    sd
+    summarise_each(tbl, funs(sd))
+    #Standard deviation of a vector
+    
+  ##### Group Data ##### 
+    
+    group_by(iris, Species)
+    #Group data into rows with the same value of Species.
+    
+    ungroup(iris)
+    #Remove grouping information from data frame.
+    
+    iris %>% group_by(Species) %>% summarise(…)
+    #Compute separate summary row for each group.
+    
+  ##### Add Row/Column ##### 
+    
+    add_row(.data, ..., .before = NULL, .after = NULL)
+    add_row(faithful, eruptions = 1, waiting = 1)
+    add_row(tbl, name = "EEE", gender = 0, score =5)
+    #Add one or more rows to a table.
+    
+    add_column(.data, ..., .before = NULL, .after = NULL) 
+    add_column(mtcars, new = 1:32)
+    add_column(tbl, new = 1:4)
+    #Add new column(s). Also add_count(),add_tally(). 
+    
+    
+    ## Tidy data does not use rownames, which store a variable 
+    ## outside of the columns. To work with the rownames, first 
+    ## move them into a column. 
+    
+    rownames_to_column()
+    rownames_to_column(tbl, var = "C") 
+    # Move row names into col.
+    
+    column_to_rownames()
+    column_to_rownames(tbl, var = "name")
+    #Move col in row names.
+    
+    
+  ##### Make New Variables mutate/transmute##### 
+    
+    mutate(iris, sepal = Sepal.Length + Sepal.Width)
+    mutate(tbl, prueba = score + gender)
+    # Compute and append one or more new columns
+    
+    mutate_each(iris, funs(min_rank))
+    mutate_each(tbl, funs(dense_rank))
+    #Apply window function to each column. 
+    
+    mutate_if(iris, is.numeric, funs(log(.)))
+    #Apply window function to each column with conditional. 
+    
+    mutate_at(.tbl, .cols, .funs, …) 
+    mutate_at(iris, vars( -Species), funs(log(.)))
+    #Apply funs to specific columns. 
+    #Use with funs(), vars() and the helper functions for select().
+    
+    
+    transmute(iris, sepal = Sepal.Length + Sepal.Width)
+    transmute(tbl, prueba = score + gender)
+    #Compute one or more new columns. Drop original columns
+    
+    # Mutate uses window functions, functions that take a vector of
+    # values and return another vector of values, such as:
+    
+    lead
+    mutate(tbl, prueba = lead(score))
+    # Copy with values shifed by 1.
+    
+    lag
+    mutate(tbl, prueba = lag(score))
+    # Copy with values lagged by 1.
+    
+    dense_rank()
+    mutate(tbl, prueba = dense_rank(score))
+    # Ranks with no gaps. 
+    
+    min_rank()
+    mutate(tbl, prueba = min_rank(score))
+    # Ranks. Ties get min rank. 
+    
+    percent_rank
+    mutate(tbl, prueba = percent_rank(score))
+    # Ranks rescaled to [0, 1].
+    
+    row_number
+    mutate(tbl, prueba = row_number(score))
+    # Ranks. Ties got to first value
+    
+    ntile
+    mutate(tbl, prueba = ntile(score,2))
+    # Bin vector into n buckets
+    
+    between
+    # Are values between a and b?
+    
+    cume_dist
+    mutate(tbl, prueba = cume_dist(score))
+    # Cumulative distribution
+    
+    cumall
+    mutate(tbl, prueba = cumall(score))
+    # Cumulative all
+    
+    cumany
+    mutate(tbl, prueba = cumany(score))
+    # Cumulative any
+    
+    cummean
+    mutate(tbl, prueba = cummean(score))
+    # Cumulative mean
+    
+    cumsum
+    mutate(tbl, prueba = cumsum(score))
+    #Cumulative sum
+    
+    cummax
+    mutate(tbl, prueba = cummax(score))
+    #Cumulative max
+    
+    cummin
+    mutate(tbl, prueba = cummin(score))
+    #Cumulative min
+    
+    cumprod
+    mutate(tbl, prueba = cumprod(score))
+    #Cumulative prod
+    
+    pmax
+    mutate(tbl, prueba = pmax(score))
+    #Element-wise max
+    
+    pmin
+    mutate(tbl, prueba = pmin(score))
+    #Element-wise min
+    
+  ##### Combine Data Sets ##### 
+    
+    a <- data.frame(x1=c("A","B","C"),x2=c(1,2,3));a
+    b <- data.frame(x1=c("A","B","D"),x3=c(T,F,T));b
+    
+    at <- tbl_df(a);at
+    bt <- tbl_df(b);bt
+    
+    ## Mutating Joins ## 
+    
+    
+    left_join(a, b, by = "x1")
+    left_join(at, bt, by = "x1")
+    #Join matching rows from b to a.
+    
+    right_join(a, b, by = "x1")
+    right_join(at, bt) 
+    #Join matching rows from a to b.
+    
+    inner_join(a, b, by = "x1")
+    inner_join(at, bt, by = "x1")
+    #Join data. Retain only rows in both sets.
+    
+    full_join(a, b, by = "x1")
+    full_join(at, bt, by = "x1")
+    #Join data. Retain all values, all rows.
+    
+    
+    ## Filtering Joins ## 
+    
+    
+    semi_join(a, b, by = "x1")
+    semi_join(at, bt, by = "x1")
+    #All rows in a that have a match in b.
+    anti_join(a, b, by = "x1")
+    anti_join(at, bt, by = "x1")
+    #All rows in a that do not have a match in b
+    
+    
+    ## Set Operations ## 
+    
+    
+    y <- data.frame(x1=c("A","B","C"),x2=c(1,2,3));y
+    z <- data.frame(x1=c("B","C","D"),x2=c(2,3,4));z
+    
+    yt <- tbl_df(y);yt
+    zt <- tbl_df(z);zt
+    
+    
+    intersect(y, z)
+    intersect(yt, zt)
+    #Rows that appear in both y and z.
+    
+    union(y, z)
+    union(yt, zt)
+    #Rows that appear in either or both y and z.
+    
+    setdiff(y, z)
+    setdiff(yt, zt)
+    #Rows that appear in y but not z.
+    
+    
+    ## Binding ## 
+    
+    
+    bind_rows(y, z)
+    bind_rows(yt, zt)
+    #Append z to y as new rows.
+    
+    bind_cols(y, z)
+    bind_cols(yt, zt)
+    #Append z to y as new columns.
+    #Caution: matches rows by position
+    
+    
+    
+  }
+
+# library(ggplot2) ####  
+library(ggplot2)
+{
+  ##### Basics ##### 
+  
+  ggplot(data = mpg, aes(x = cty, y = hwy)) 
+  # Begins a plot  that you finish by adding layers to. 
+  # Add one geom function per layer
+  
+  qplot(x = cty, y = hwy, data = mpg, geom = "point")
+  # Creates a complete plot with given data, geom, and
+  # mappings. Supplies many useful defaults.
+  
+  last_plot() 
+  #Returns the last plot
+  
+  ggsave("plot.png", width = 5, height = 5) 
+  # Saves last plot as 5’ x 5’ file named "plot.png" in working directory.
+  # Matches file type to file extension
+  
+  ##### Geoms PRIMITIVES ##### 
+  
+  a <- ggplot(economics, aes(date, unemploy))
+  b <- ggplot(seals, aes(x = long, y = lat))
+  
+  a + geom_blank()
+  #(Useful for expanding limits)
+  
+  b + geom_curve(aes(yend = lat + 1, xend=long+1,curvature=z)) 
+  # x, xend, y, yend, alpha, angle, color, curvature, linetype, size
+  
+  a + geom_path(lineend="butt", linejoin="round", linemitre=1)
+  #x, y, alpha, color, group, linetype, size
+  
+  a + geom_polygon(aes(group = group)) 
+  #x, y, alpha, color, fill, group, linetype, size
+  
+  b + geom_rect(aes(xmin = long, ymin=lat, xmax= long + 1, ymax = lat + 1)) 
+  #xmax, xmin, ymax, ymin, alpha, color, fill, linetype, size
+  
+  a + geom_ribbon(aes(ymin=unemploy - 900, ymax=unemploy + 900)) 
+  # x, ymax, ymin, alpha, color, fill, group, linetype, size
+  
+  ##### Geoms LINE SEGMENTS ##### 
+  
+  b + geom_abline(aes(intercept=0, slope=1))
+  b + geom_hline(aes(yintercept = lat))
+  b + geom_vline(aes(xintercept = long))
+  
+  b + geom_segment(aes(yend=lat+1, xend=long+1))
+  b + geom_spoke(aes(angle = 1:1155, radius = 1))
+  
+  ##### Geoms ONE VARIABLE continuous ##### 
+  
+  c <- ggplot(mpg, aes(hwy)); c2 <- ggplot(mpg)
+  
+  c + geom_area(stat = "bin")
+  # x, y, alpha, color, fill, linetype, size
+  
+  c + geom_density(kernel = "gaussian") 
+  # x, y, alpha, color, fill, group, linetype, size, weight
+  
+  c + geom_dotplot()
+  #x, y, alpha, color, fill
+  
+  c + geom_freqpoly() 
+  #x, y, alpha, color, group, linetype, size
+  
+  c + geom_histogram(binwidth = 5) 
+  # x, y, alpha, color, fill, linetype, size, weight 
+  
+  c2 + geom_qq(aes(sample = hwy)) 
+  # x, y, alpha, color, fill, linetype, size, weight
+  
+  ##### Geoms ONE VARIABLE discrete #####
+  
+  d <- ggplot(mpg, aes(fl))
+  
+  d + geom_bar()
+  # x, alpha, color, fill, linetype, size, weight
+  
+  ##### Geoms TWO VARIABLES continuous x , continuous y #####
+  
+  e <- ggplot(mpg, aes(cty, hwy))
+  
+  e + geom_label(aes(label = cty), nudge_x = 1, nudge_y = 1, check_overlap = TRUE) 
+  # x, y, label, alpha, angle, color, family, fontface, hjust,
+  # lineheight, size, vjust
+  
+  e + geom_jitter(height = 2, width = 2) 
+  # x, y, alpha, color, fill, shape, size 
+  
+  e + geom_point() 
+  # x, y, alpha, color, fill, shape, size, stroke
+  
+  e + geom_quantile()
+  # x, y, alpha, color, group, linetype, size, weight
+  
+  e + geom_rug(sides = "bl")
+  # x, y, alpha, color, linetype, size
+  
+  e + geom_smooth(method = lm)
+  # x, y, alpha, color, fill, group, linetype, size, weight
+  
+  e + geom_text(aes(label = cty), nudge_x = 1, nudge_y = 1, check_overlap = TRUE)
+  # x, y, label, alpha, angle, color, family, fontface, hjust,
+  # lineheight, size, vjust
+  
+  ##### Geoms TWO VARIABLES discrete x , continuous y  #####
+  
+  f <- ggplot(mpg, aes(class, hwy))
+  
+  f + geom_col()
+  # x, y, alpha, color, fill, group, linetype, size
+  
+  f + geom_boxplot()
+  # x, y, lower, middle, upper, ymax, ymin, alpha, color, fill, group, linetype,
+  # shape, size, weight 
+  
+  f + geom_dotplot(binaxis = "y", stackdir = "center")
+  # x, y, alpha, color, fill, group
+  
+  f + geom_violin(scale = "area")
+  # x, y, alpha, color, fill, group, linetype, size, weight
+  
+  ##### Geoms TWO VARIABLES discrete x , discrete y #####
+  
+  g <- ggplot(diamonds, aes(cut, color))
+  
+  g + geom_count()
+  # x, y, alpha, color, fill, shape, size, stroke
+  
+  ##### Geoms TWO VARIABLES continuous bivariate distribution #####
+  
+  h <- ggplot(diamonds, aes(carat, price))
+  
+  h + geom_bin2d(binwidth = c(0.25, 500)) 
+  # x, y, alpha, color, fill, linetype, size, weight
+  
+  h + geom_density2d()
+  # x, y, alpha, colour, group, linetype, size
+  
+  h + geom_hex()
+  # x, y, alpha, colour, fill, size
+  
+  ##### Geoms TWO VARIABLES continuous function #####
+  
+  i <- ggplot(economics, aes(date, unemploy))
+  
+  i + geom_area()
+  # x, y, alpha, color, fill, linetype, size
+  
+  i + geom_line()
+  # x, y, alpha, color, group, linetype, size
+  
+  i + geom_step(direction = "hv")
+  # x, y, alpha, color, group, linetype, size
+  
+  ##### Geoms TWO VARIABLES visualizing error #####
+  
+  df <- data.frame(grp = c("A", "B"), fit = 4:5, se = 1:2); df
+  j <- ggplot(df, aes(grp, fit, ymin = fit-se, ymax = fit+se))
+  
+  
+  j + geom_crossbar(fatten = 2) 
+  # x, y, ymax, ymin, alpha, color, fill, group, linetype, size
+  
+  j + geom_errorbar()
+  # x, ymax, ymin, alpha, color, group, linetype, size, width
+  # See Also geom_errorbarh()
+  
+  j + geom_linerange()
+  # x, ymin, ymax, alpha, color, group, linetype, size
+  
+  j + geom_pointrange()
+  # x, y, ymin, ymax, alpha, color, fill, group, linetype, shape, size
+  
+  ##### Geoms TWO VARIABLES maps #####
+  
+  data <- data.frame(murder = USArrests$Murder,
+                     state = tolower(rownames(USArrests)));data
+  map <- map_data("state");map
+  k <- ggplot(data, aes(fill = murder))
+  
+  k + geom_map(aes(map_id = state), map = map) + expand_limits(x = map$long, y = map$lat)
+  # map_id, alpha, color, fill, linetype, size
+  
+  ##### Geoms THREE VARIABLES #####
+  
+  seals$z <- with(seals, sqrt(delta_long^2 + delta_lat^2));seals$z
+  l <- ggplot(seals, aes(long, lat))
+  
+  l + geom_contour(aes(z = z))
+  # x, y, z, alpha, colour, group, linetype, size, weight
+  
+  l + geom_raster(aes(fill = z), hjust=0.5, vjust=0.5,interpolate=FALSE)
+  # x, y, alpha, fill
+  
+  l + geom_tile(aes(fill = z))
+  # x, y, alpha, color, fill, linetype, size, width
+  
+  ##### Stats Basics #####
+  
+  ## A stat builds new variables to plot (e.g., count, prop).
+  
+  #      stat fun         geommappings             geom to use
+  #         |                   |                       |
+  #         v            [---------------]              v
+  i + stat_density2d(aes(fill = ..level..), geom = "polygon")
+  #                                 ^
+  #                                 |
+  #                       variable created by stat
+  
+  
+  c <- ggplot(mpg, aes(hwy)); c2 <- ggplot(mpg)
+  e <- ggplot(mpg, aes(cty, hwy))
+  f <- ggplot(mpg, aes(class, hwy))
+  h <- ggplot(diamonds, aes(carat, price))
+  l <- ggplot(seals, aes(long, lat))
+  
+  
+  
+  ##### Stats ONE VARIABLE continuous ##### 
+  
+  
+  c + stat_bin(binwidth = 1, origin = 10)
+  # x, y | ..count.., ..ncount.., ..density.., ..ndensity..
+  
+  c + stat_count(width = 1) 
+  # x, y, | ..count.., ..prop..
+  
+  c + stat_density(adjust = 1, kernel = "gaussian")
+  # x, y, | ..count.., ..density.., ..scaled..
+  
+  
+  ##### Stats TWO VARIABLES continuous x , continuous y ##### 
+  
+  
+  e + stat_bin_2d(bins = 30, drop = T)
+  # x, y, fill | ..count.., ..density..
+  
+  e + stat_bin_hex(bins=30) 
+  # x, y, fill | ..count.., ..density..
+  
+  e + stat_density_2d(contour = TRUE, n = 100)
+  # x, y, color, size | ..level..
+  
+  e + stat_ellipse(level = 0.95, segments = 51, type = "t")
+  
+  e + stat_ecdf(n = 40) 
+  # x, y | ..x.., ..y..
+  
+  e + stat_quantile(quantiles = c(0.1, 0.9), formula = y ~ log(x), method = "rq")
+  #x, y | ..quantile..
+  
+  e + stat_smooth(method = "lm", formula = y ~ x, se=T, level=0.95) 
+  # x, y | ..se.., ..x.., ..y.., ..ymin.., ..ymax.
+  
+  e + stat_identity(na.rm = TRUE)
+  
+  e + stat_sum() 
+  # x, y, size | ..n.., ..prop..
+  
+  e + stat_summary(fun.data = "mean_cl_boot")
+  
+  e + stat_unique()
+  
+  
+  ##### Stats TWO VARIABLES discrete x , continuous y ##### 
+  
+  
+  f + stat_boxplot(coef = 1.5) 
+  # x, y | ..lower.., ..middle.., ..upper.., ..width.. , ..ymin.., ..ymax..
+  
+  f + stat_ydensity(kernel = "gaussian", scale = "area") 
+  # x, y | ..density.., ..scaled.., ..count.., ..n.., ..violinwidth.., ..width..
+  
+  
+  ##### Stats TWO VARIABLES continuous bivariate distribution ##### 
+  
+  
+  h + stat_summary_bin(fun.y = "mean", geom = "bar")
+  
+  
+  ##### Stats THREE VARIABLES ##### 
+  
+  
+  l + stat_contour(aes(z = z)) 
+  # x, y, z, order | ..level..
+  
+  l + stat_summary_hex(aes(z = z), bins = 30, fun = max)
+  # x, y, z, fill | ..value..
+  
+  l + stat_summary_2d(aes(z = z), bins = 30, fun = mean)
+  # x, y, z, fill | ..value..
+  
+  
+  ##### Stats Pendientes ##### 
+  
+  ggplot() + stat_function(aes(x = -3:3), n = 99, fun = dnorm, args = list(sd=0.5)) 
+  # x | ..x.., ..y..
+  
+  ggplot() + stat_qq(aes(sample=1:100), dist = qt, dparam=list(df=5)) 
+  # sample, x, y | ..sample.., ..theoretical..
+  
+  ##### Scales Basics #####
+  
+  # Scales map data values to the visual values of an
+  # aesthetic. To change a mapping, add a new scale
+  
+  d <- ggplot(mpg, aes(fl))
+  n <- d + geom_bar(aes(fill = fl));n
+  
+  
+  n + scale_fill_manual(
+    values = c("skyblue", "royalblue", "blue", "navy"),
+    limits = c("d", "e", "p", "r"), 
+    breaks =c("d", "e", "p", "r"), 
+    name = "fuel", 
+    labels = c("D", "E", "P", "R"))
+  
+  ##### Scales GENERAL PURPOSE SCALES ##### 
+  
+  # Use with most aesthetics
+  
+  scale_*_continuous() 
+  # map cont’ values to visual ones
+  
+  scale_*_discrete() 
+  # map discrete values to visual ones
+  
+  scale_*_identity() 
+  # use data values as visual ones
+  
+  scale_*_manual(values = c()) 
+  # map discrete values to manually chosen visual ones
+  
+  scale_*_date(date_labels = "%m/%d"), date_breaks = "2 weeks") 
+# treat data values as dates. 
+
+scale_*_datetime() 
+# treat data x values as date times. Use same arguments as scale_x_date(). 
+# See ?strptime for label formats.
+
+  ##### Scales X & Y LOCATION SCALES ##### 
+
+# Use with x or y aesthetics (x shown here)
+
+scale_x_log10() 
+# Plot x on log10 scale
+
+scale_x_reverse() 
+# Reverse direction of x axis
+
+scale_x_sqrt() 
+# Plot x on square root scale
+
+  ##### Scales COLOR AND FILL SCALES (DISCRETE) ##### 
+
+d <- ggplot(mpg, aes(fl))
+n <- d + geom_bar(aes(fill = fl));n
+
+n + scale_fill_brewer(palette = "Blues")
+#For palette choices:  RColorBrewer::display.brewer.all()
+
+n + scale_fill_grey(start = 0.2, end = 0.8, na.value = "red")
+
+  ##### Scales COLOR AND FILL SCALES (CONTINUOUS) #####
+
+c <- ggplot(mpg, aes(hwy)); c2 <- ggplot(mpg)
+o <- c + geom_dotplot(aes(fill = ..x..)); o
+
+
+o + scale_fill_distiller(palette = "Blues")
+
+o + scale_fill_gradient(low="red", high="yellow")
+
+o + scale_fill_gradient2(low="red", high="blue", mid = "white", midpoint = 25)
+
+o + scale_fill_gradientn(colours=topo.colors(6))
+# Also: rainbow(), heat.colors(), terrain.colors(),
+# cm.colors(), RColorBrewer::brewer.pal()
+
+  ##### Scales SHAPE AND SIZE SCALES #####
+
+e <- ggplot(mpg, aes(cty, hwy))
+p <- e + geom_point(aes(shape = fl, size = cyl));p
+
+p + scale_shape() + scale_size()
+
+p + scale_shape_manual(values = c(3:7))
+
+p + scale_radius(range = c(1,6))
+
+p + scale_size_area(max_size = 6)
+
+  ##### Coordinate Systems #####
+
+
+d <- ggplot(mpg, aes(fl))
+r <- d + geom_bar();r
+
+
+r + coord_cartesian(xlim = c(0, 5)) 
+# xlim, ylim
+# The default cartesian coordinate system
+
+r + coord_fixed(ratio = 1/2) 
+# ratio, xlim, ylim 
+# Cartesian coordinates with fixed aspect ratio between x and y units
+
+r + coord_flip()
+# xlim, ylim 
+# Flipped Cartesian coordinates
+
+r + coord_polar(theta = "x", direction=1 ) 
+# theta, start, direction
+# Polar coordinates
+
+r + coord_trans(ytrans = "sqrt") 
+# xtrans, ytrans, limx, limy 
+# Transformed cartesian coordinates. Set xtrans and
+# ytrans to the name of a window function.
+
+  ##### Position Adjustments #####
+
+# Position adjustments determine how to arrange geoms
+# that would otherwise occupy the same space
+
+s <- ggplot(mpg, aes(fl, fill = drv))
+s + geom_bar()
+
+
+s + geom_bar(position = "dodge")
+# Arrange elements side by side
+
+s + geom_bar(position = "fill")
+# Stack elements on top of one another, normalize height
+
+s + geom_bar(position = "stack")
+# Stack elements on top of one another
+
+s + geom_bar(position = position_dodge(width = 1))
+# Each position adjustment can be recast as a function with
+# manual width and height arguments
+
+  ##### Themes #####
+
+r <- d + geom_bar(); r
+
+r + theme_bw()
+# White background with grid lines
+
+r + theme_gray()
+# Grey background (default theme)
+
+r + theme_dark() 
+# dark for contrast
+
+r + theme_classic()
+
+r + theme_light()
+
+r + theme_linedraw()
+
+r + theme_minimal()
+# Minimal themes
+
+r + theme_void()
+# Empty theme
+
+
+RColorBrewer::display.brewer.all()
+
+  ##### Faceting #####
+
+# Facets divide a plot into subplots based on the
+# values of one or more discrete variables.
+
+t <- ggplot(mpg, aes(cty, hwy)) + geom_point();t
+
+
+t + facet_grid(. ~ fl)
+# facet into columns based on fl
+
+t + facet_grid(year ~ .)
+# facet into rows based on year
+
+t + facet_grid(year ~ fl)
+# facet into both rows and columns 
+
+t + facet_wrap(~ fl) 
+# wrap facets into a rectangular layout
+
+
+## Set scales to let axis limits vary across facets
+
+
+t + facet_grid(drv ~ fl, scales = "free")
+# x and y axis limits adjust to individual facets
+
+"free_x" # x axis limits adjust
+"free_y" # y axis limits adjust
+
+
+## Set labeller to adjust facet labels
+
+t + facet_grid(. ~ fl, labeller = label_both)
+
+t + facet_grid(fl ~ ., labeller = label_bquote(alpha ^ .(fl)))
+
+t + facet_grid(. ~ fl, labeller = label_parsed)
+
+  ##### Legends #####
+
+n + theme(legend.position = "bottom") 
+# Place legend at "bottom", "top", "left", or "right"
+
+n + guides(fill = "none") 
+# Set legend type for each aesthetic: colorbar, legend, or none (no legend)
+
+n + scale_fill_discrete(name = "Title", labels = c("A", "B", "C", "D", "E")) 
+# Set legend title and labels with a scale function.
+
+  ##### Zooming #####
+
+## Without clipping  (preferred)
+
+t + coord_cartesian(  xlim = c(0, 100), ylim = c(10, 20))
+
+## With clipping (removes unseen data points)
+
+t + xlim(0, 100) + ylim(10, 20)
+t + scale_x_continuous(limits = c(0, 100)) + scale_y_continuous(limits = c(0, 100))
+
+}
+
+library(purrr)
+# library(purrr) ) ####  
+
+## http://www.rebeccabarter.com/blog/2019-08-19_purrr/
+{
+
+  
+  my_first_list <- list(my_number = 5,
+                        my_vector = c("a", "b", "c"),
+                        my_dataframe = data.frame(a = 1:3, b = c("q", "b", "z"), 
+                                                  c = c("bananas", "are", "so very great")))
+  my_first_list
+  
+  
+  
+  addTen <- function(.x) {
+    return(.x + 10)
+  }
+  
+  
+  
+  library(tidyverse)
+  map(.x = c(1, 4, 7), 
+      .f = addTen)
+  
+  map(c(1, 4, 7), addTen)
+  
+  
+  
+  
+  map(data.frame(a = 1, b = 4, c = 7), addTen)
+  map_dbl(c(1, 4, 7), addTen)
+  map_chr(c(1, 4, 7), addTen)
+  map_df(c(1, 4, 7), function(.x) {
+    return(data.frame(old_number = .x, 
+                      new_number = addTen(.x)))
+  })
+  modify(c(1, 4, 7), addTen)
+  
+  
+  modify_if(.x = list(1, 4, 7), 
+            .p = function(x) x > 5,
+            .f = addTen)
+  
+  # to download the data directly:
+  gapminder_orig <- read.csv("https://raw.githubusercontent.com/swcarpentry/r-novice-gapminder/gh-pages/_episodes_rmd/data/gapminder-FiveYearData.csv")
+  # define a copy of the original dataset that we will clean and play with 
+  gapminder <- gapminder_orig;head(gapminder_orig);class(gapminder)
+  
+  gapminder %>% map_chr(class)
+  # apply the n_distinct() function to each column
+  gapminder %>% map_dbl(n_distinct)
+  
+  gapminder %>% map_df(~(data.frame(n_distinct = n_distinct(.x),
+                                    class = class(.x))))
+  
+  gapminder %>% map_df(~(data.frame(n_distinct = n_distinct(.x),
+                                    class = class(.x))),
+                       .id = "variable")
+  
+  
+  
+  # take the first element of the gapminder data
+  .x <- gapminder %>% pluck(1)
+  # look at the first 6 rows
+  head(.x)
+  data.frame(n_distinct = n_distinct(.x),
+             class = class(.x))
+  
+  
+  
+  gapminder %>% map_df(~(data.frame(n_distinct = n_distinct(.x),
+                                    class = class(.x))),
+                       .id = "variable")
+  
+  
+  map2(.x = object1, # the first object to iterate over
+       .y = object2, # the second object to iterate over
+       .f = plotFunction(.x, .y))
+  
+  continent_year <- gapminder %>% distinct(continent, year); head(continent_year)
+  
+  # extract the continent and year pairs as separate vectors
+  continents <- continent_year %>% pull(continent) %>% as.character;head(continents)
+  years <- continent_year %>% pull(year); head(years)
+  
+  # try to figure out the code for the first example
+  .x <- continents[1];.x
+  .y <- years[1]; .y
+  # make a scatterplot of GDP vs life expectancy in all Asian countries for 1952
+  gapminder %>% 
+    filter(continent == .x,
+           year == .y) %>%
+    ggplot() +
+    geom_point(aes(x = gdpPercap, y = lifeExp)) +
+    ggtitle(glue::glue(.x, " ", .y))
+  
+  plot_list <- map2(.x = continents, 
+                    .y = years, 
+                    .f = ~{
+                      gapminder %>% 
+                        filter(continent == .x,
+                               year == .y) %>%
+                        ggplot() +
+                        geom_point(aes(x = gdpPercap, y = lifeExp)) +
+                        ggtitle(glue::glue(.x, " ", .y))
+                    })
+  plot_list[[1]]          
+  plot_list[[22]]          
+  
+  gapminder_nested <- gapminder %>% 
+    group_by(continent) %>% 
+    nest()
+  gapminder_nested
+  gapminder_nested$data[[1]]
+  
+  
+  gapminder_nested %>% 
+    # extract the first entry from the data column
+    pluck("data", 1)
+  gapminder_nested %>% pluck("data", 5)
+  
+  tibble(vec_col = 1:10) %>%
+    mutate(vec_sum = sum(vec_col))
+  
+  tibble(list_col = list(c(1, 5, 7), 
+                         5, 
+                         c(10, 10, 11))) %>%
+    mutate(list_sum = sum(list_col))
+  
+  tibble(list_col = list(c(1, 5, 7), 
+                         5, 
+                         c(10, 10, 11))) %>%
+    mutate(list_sum = map(list_col, sum))
+  
+  tibble(list_col = list(c(1, 5, 7), 
+                         5, 
+                         c(10, 10, 11))) %>%
+    mutate(list_sum = map(list_col, sum)) %>% 
+    pull(list_sum)
+  
+  tibble(list_col = list(c(1, 5, 7), 
+                         5, 
+                         c(10, 10, 11))) %>%
+    mutate(list_sum = map_dbl(list_col, sum))
+  
+  
+  
+  
+  gapminder_nested$data[[1]]
+  gapminder_nested %>% 
+    mutate(avg_lifeExp = mean(data$lifeExp))
+  
+  # the first entry of the "data" column
+  .x <- gapminder_nested %>% pluck("data", 1);.x
+  mean(.x$lifeExp)
+  
+  
+  gapminder_nested %>% 
+    mutate(avg_lifeExp = map_dbl(data, ~{mean(.x$lifeExp)}))
+  
+  
+  # fit a model separately for each continent
+  gapminder_nested <- gapminder_nested %>% 
+    mutate(lm_obj = map(data, 
+                        ~lm(lifeExp ~ pop + gdpPercap + year, 
+                            data = .x))); gapminder_nested
+  gapminder_nested %>% pluck("lm_obj", 1)
+  
+  
+  # predict the response for each continent
+  gapminder_nested <- gapminder_nested %>% 
+    mutate(pred = map2(lm_obj, 
+                       data, 
+                       function(.lm, .data) predict(.lm, .data)));gapminder_nested
+  
+  
+  # calculate the correlation between observed and predicted response for each continent
+  gapminder_nested <- gapminder_nested %>% 
+    mutate(cor = map2_dbl(pred, 
+                          data, 
+                          function(.pred, .data) cor(.pred, .data$lifeExp)));gapminder_nested
+  
+  
+  
+  head(gapminder_orig);class(gapminder)
+  gapminder_nested
+  
+  set.seed(23489)
+  gapminder_list <- gapminder %>% split(gapminder$continent) %>%
+    map(~sample_n(., 5));gapminder_list
+  
+  gapminder_list %>%
+    keep(~{mean(.x$lifeExp) > 70})
+  
+  discard() ## does the opposite of keep(): it discards any elements that satisfy 
+  ## your logical condition.
+  
+  
+  reduce(c(1, 2, 3), sum)
+  accumulate(c(1, 2, 3), sum)
+  
+  gapminder_list %>%
+    reduce(rbind)
+  
+  gapminder_list %>% every(~{mean(.x$life) > 70})
+  gapminder_list %>% some(~{mean(.x$life) > 70})
+  list(1, c(2, 5, 1), "a") %>% has_element("a")
+  
+  #1
+  head(gapminder)
+  #2
+  gapminder %>% 
+    group_by(continent) %>% 
+    nest()
+  #3
+  x=gapminder %>% 
+    group_by(continent) %>% 
+    nest() %>%
+    mutate(lm_obj = map(data, ~lm(lifeExp ~ pop + year + gdpPercap, data = .)));x
+  x$lm_obj[[1]]
+  #4
+  x=gapminder %>% 
+    group_by(continent) %>% 
+    nest() %>%
+    mutate(lm_obj = map(data, ~lm(lifeExp ~ pop + year + gdpPercap, data = .))) %>%
+    mutate(lm_tidy = map(lm_obj, broom::tidy));x
+  x$lm_tidy[[1]]
+  #5
+  x <- gapminder %>% 
+    group_by(continent) %>% 
+    nest() %>%
+    mutate(lm_obj = map(data, ~lm(lifeExp ~ pop + year + gdpPercap, data = .))) %>%
+    mutate(lm_tidy = map(lm_obj, broom::tidy)) %>%
+    ungroup();x
+  #6
+  x <- gapminder %>% 
+    group_by(continent) %>% 
+    nest() %>%
+    mutate(lm_obj = map(data, ~lm(lifeExp ~ pop + year + gdpPercap, data = .))) %>%
+    mutate(lm_tidy = map(lm_obj, broom::tidy)) %>%
+    ungroup() %>%
+    transmute(continent, lm_tidy);x
+  x$lm_tidy[[1]]
+  #7
+  x=gapminder %>% 
+    group_by(continent) %>% 
+    nest() %>%
+    mutate(lm_obj = map(data, ~lm(lifeExp ~ pop + year + gdpPercap, data = .))) %>%
+    mutate(lm_tidy = map(lm_obj, broom::tidy)) %>%
+    ungroup() %>%
+    transmute(continent, lm_tidy) %>%
+    unnest(cols = c(lm_tidy));x
+  
+}
+
+## A vector is a way of storing many individual elements (a single number or 
+## a single character or string) of the same type together in a single object,
+ 
+## A data frame is a way of storing many vectors of the same length but 
+## possibly of different types together in a single object
+
+## A list is a way of storing many objects of any type (e.g. data frames, 
+## plots, vectors) together in a single object
+
+## Note that a data frame is actually a special case of a list where each 
+## element of the list is a vector of the same length.
+{
+  ##### Apply Functions BASICS #####
+
+df <- data.frame(name=c("AAA", "BBB", "CCC", "DDD"), score = c(10, 10, 9, 8),
+                 gender = c(0, 1, 0, 1)); df
+tbl <- tbl_df(df); tbl
+addTen <- function(.x) {
+  return(.x + 10)
+}
+
+modify(.x, .f, …) 
+modify(c(1, 4, 7), addTen)
+# Like map() but return an object of the same type as the input
+
+modify_if(.x = list(1, 4, 7), 
+          .p = function(x) x > 5,
+          .f = addTen)
+modify_if(.x = list(1, 4, 7), 
+          .p = ~{.x > 5},
+          .f = ~{.x + 10})
+
+map(.x, .f, …)
+map(data.frame(a = 1, b = 4, c = 7), addTen)
+map_dbl(c(1, 4, 7), ~{.x + 10})
+# Apply a function to each element of a list or vector. map(x, is.logical)
+
+map2(.x, ,y, .f, …)
+map2(df$score,df$gender, sum)
+map2(tbl$score,tbl$gender, sum)
+# Apply a function to pairs of elements from two lists, vectors. map2(x, y, sum)
+
+pmap(.l, .f, …) 
+pmap(list(df$score,df$gender,df$score), sum)
+pmap(list(tbl$score,tbl$gender,tbl$score), sum)
+# Apply a function to groups of elements from list of lists, vectors. 
+# pmap(list(x, y, z), sum, na.rm = TRUE)
+
+invoke_map(.f, .x = list(NULL), …, .env=NULL)
+# Run each function in a list.
+# Also invoke.
+l <- list(var, sd); invoke_map(l, x = 1:9)
+
+lmap(.x, .f, ...) 
+# Apply function to each list-element of a list or vector.
+
+imap(.x, .f, ...) 
+# Apply .f to each element of a list or vector and its index
+
+  ##### Apply Functions OUTPUT #####
+
+## map(), map2(), pmap(), imap and invoke_map each return a list. 
+## Use a suffixed version to return the results as a specific type of flat
+## vector, e.g. map2_chr, pmap_lgl, etc. 
+
+## Use walk, walk2, and pwalk to trigger side effects. 
+# Each return its input invisibly
+
+## function           returns
+map     ##     ->     list
+map_chr ##     ->     character vector
+map_dbl ##     ->     double (numeric) vector
+map_dfc ##     ->     data frame (column bind)
+map_dfr ##     ->     data frame (row bind)
+map_int ##     ->     integer vector
+map_lgl ##     ->     logical vector
+walk    ##     ->     triggers side effects, returns the input invisibly
+
+  ##### Work with Lists FILTER LISTS ##### 
+
+df <- data.frame(name=c("AAA", "BBB", "CCC", "DDD"), score = c(10, 10, 9, 8),
+                 gender = c(0, 1, 0, 1)); df
+tbl <- tbl_df(df); tbl
+
+
+pluck(.x, ..., .default=NULL)
+pluck(df,2)
+pluck(tbl$name,2)
+# Select an element by name or index, pluck(x,"b") ,or its
+# attribute with attr_getter. pluck(x,"b",attr_getter("n"))
+
+keep(.x, .p, …) 
+keep(df$score,df$gender==1)
+keep(tbl$score,df$gender==1)
+#Select elements that pass a logical test. keep(x, is.na)
+
+discard(.x, .p, …) 
+discard(df$score,df$gender==1)
+discard(tbl$score,df$gender==1)
+# Select elements that do not pass a logical test. discard(x, is.na)
+
+compact(.x, .p = identity)
+# Drop empty elements. compact(x)
+
+head_while(.x, .p, …)
+
+pos <- function(x) x >= 0
+head_while(5:-5, pos)
+tail_while(5:-5, negate(pos))
+# Return head elements until one does not pass.
+# Also tail_while. head_while(x, is.character)
+
+  ##### Work with Lists RESHAPE LISTS ##### 
+
+flatten(.x)
+flatten(df)
+flatten(tbl)
+# Remove a level of indexes from a list. 
+# Also flatten_chr, flatten_dbl, flatten_dfc, flatten_dfr, 
+#      flatten_int, flatten_lgl.
+
+transpose(.l, .names = NULL) 
+transpose(df) 
+transpose(tbl) 
+# Transposes the index order in a multi-level list.
+
+  ##### Work with Lists SUMMARISE LISTS ##### 
+
+every(.x, .p, …) 
+#Do all elements pass a test? every(x, is.character)
+
+some(.x, .p, …) 
+# Do some elements pass a test? some(x, is.character) 
+
+has_element(.x, .y) 
+# Does a list contain an element?   has_element(x, "foo")
+
+detect(.x, .f, ..., .right=FALSE,.p) 
+# Find first element to pass. detect(x, is.character)
+
+detect_index(.x, .f, ..., .right = FALSE, .p) 
+# Find index of first element to pass. detect_index(x, is.character)
+
+vec_depth(.x) 
+# Return depth (number of levels of indexes). vec_depth(x)
+
+  ##### Work with Lists JOIN (TO) LISTS ##### 
+
+append(x, values, after = length(x)) 
+# Add to end of list. append(x, list(d = 1))
+
+prepend(x, values, before = 1) 
+# Add to start of list. prepend(x, list(d = 1)) 
+
+splice(…) 
+# Combine objects into a list, storing S3 objects as sub-lists. 
+# splice(x, y, "foo")
+
+  ##### Work with Lists TRANSFORM LISTS ##### 
+
+modify(.x, .f, ...) 
+# Apply function to each element. 
+# Also map, map_chr, map_dbl, map_dfc, map_dfr, map_int, map_lgl. 
+# modify(x, ~.+ 2)
+
+modify_at(.x, .at, .f, ...) 
+# Apply function to elements by name or index. Also map_at. 
+# modify_at(x, "b", ~.+ 2) 
+
+modify_if(.x, .p, .f, ...) 
+# Apply function to elements that pass a test. 
+# Also map_if. modify_if(x, is.numeric,~.+2)
+
+modify_depth(.x,.depth,.f,...)
+# Apply function to each element at a given level of a list. 
+# modify_depth(x, 1, ~.+ 2)
+
+  ##### Work with Lists WORK WITH LISTS ##### 
+
+array_tree(array, margin = NULL) 
+# Turn array into list. Also array_branch.
+# array_tree(x, margin = 3
+
+cross2(.x, .y, .filter = NULL)
+# All combinations of .x and .y. Also cross, cross3, cross_df.
+# cross2(1:3, 4:6)
+
+set_names(x, nm = x) 
+# Set the names of a vector/list directly or with a function.
+# set_names(x, c("p", "q", "r"))        set_names(x, tolower)
+
+  ##### Reduce Lists ##### 
+
+reduce(.x, .f, ..., .init)
+# Apply function recursively to each element of a list or vector. 
+# Also reduce_right, reduce2, reduce2_right.  
+# reduce(x, sum)
+
+accumulate(.x, .f, ..., .init)
+# Reduce, but also return intermediate results. 
+# Also accumulate_right. 
+# accumulate(x, sum)
+
+  ##### Modify function behavior ##### 
+
+compose() 
+# Compose multiple functions.
+
+lift() 
+# Change the type of input a function takes. 
+# Also lift_dl, lift_dv, lift_ld, lift_lv, lift_vd, lift_vl.
+
+rerun() 
+# Rerun expression n times.
+
+negate() 
+# Negate a predicate function (a pipe friendly !)
+
+partial() 
+# Create a version of a function that has some args preset to values.
+
+safely() 
+# Modify func to return list of results and errors.
+
+quietly() 
+# Modify function to return list of results, output, messages, warnings.
+
+possibly() 
+# Modify function to return default value whenever an error occurs 
+# (instead of error).
+
+  ##### Nested Data BASICS ##### 
+
+## A nested data frame stores individual tables within the
+## cells of a larger, organizing table.
+
+## Use a nested data frame to:
+##   • preserve relationships between observations and subsets of data
+##   • manipulate many sub-tables at once with the purrr functions map(),  
+##     map2(), or pmap().
+
+## Use a two step process to create a nested data frame:
+## 1. Group the data frame into groups with dplyr::group_by()
+## 2. Use nest() to create a nested data frame with one row per group
+
+n_iris <- iris %>% 
+  group_by(Species) %>% 
+  nest() ; n_iris
+
+n_iris$data[[1]]
+## nest(data, ..., .key = data)
+## For grouped data, moves groups into cells as data frames
+
+n_iris %>% 
+  pluck("data", 1)
+# extract the first entry from the data column
+
+
+n_iris %>% unnest(data)
+## Unnest a nested data frame with unnest(nested , data)
+  ##### Nested LIST COLUMN WORKFLOW ##### 
+
+## Nested data frames use a list column, a list that is stored as a
+## column vector of a data frame. A typical workflow for list columns:
+
+n_iris <- iris %>%
+  group_by(Species) %>%
+  nest();n_iris
+## 1 - "Make a column list"
+{
+  ## You can create list columns with functions in the tibble and 
+  ## dplyr packages, as well as tidyr’s nest()
+  
+  tribble(…)
+  ## Makes list column when needed
+  tribble( ~max, ~seq,
+           3, 1:3,
+           4, 1:4,
+           5, 1:5)
+  
+  ## Saves list input as list columns
+  tibble(max = c(3, 4, 5), seq = list(1:3, 1:4, 1:5))
+  
+  
+  enframe(x, name="name", value="value")
+  ## Converts multi-level list to tibble with list cols
+  enframe(list('3'=1:3, '4'=1:4, '5'=1:5), 'max', 'seq')
+  
+  mutate(.data, …) 
+  ## Also 
+  transmute()
+  # Returns list col when result returns list.
+  mtcars %>% mutate(seq = map(cyl, seq))
+  
+  summarise(.data, …)
+  # Returns list col when result is wrapped with list()
+  mtcars %>% group_by(cyl) %>%
+    summarise(q = list(quantile(mpg)))
+  
+}
+
+
+length(n_iris)
+mod_fun <- function(df){
+  lm(Sepal.Length ~ ., data = df)
+}
+
+m_iris <- n_iris %>%
+  mutate(model = map(data, mod_fun));m_iris
+m_iris$model[[1]]
+## 2 - Work with list columns
+{
+## Use the purrr functions map(), map2(), and pmap() to apply a function that 
+## returns a result element-wise to the cells of a list column. walk(), walk2(),
+## and pwalk() work the same way, but return a side effect.
+
+map(.x, .f, ...)
+n_iris %>% 
+  mutate(n = map(data, dim))
+## Apply .f element-wise to .x as .f(.x)
+
+map2(.x, .y, .f, ...)
+m_iris %>% 
+  mutate(n = map2(data, model, list))
+## Apply .f element-wise to .x and .y as .f(.x, .y)
+
+pmap(.l, .f, ...)
+x=m_iris %>%
+  mutate(n = pmap(list(data, model, data), list));x
+x$n[[1]]
+## Apply .f element-wise to vectors saved in .l
+
+}
+
+
+b_fun <- function(mod){
+  coefficients(mod)[[1]]
+}
+
+m_iris %>% transmute(Species,
+                     beta = map_dbl(model, b_fun))
+## 3 - Simplify the list column 
+{
+
+map_lgl(.x, .f, ...)
+  n_iris %>% 
+    transmute(n = map_lgl(data, is.matrix))
+## Apply .f element-wise to .x, return a logical vector
+
+map_int(.x, .f, ...)
+n_iris %>% 
+  transmute(n = map_int(data, nrow))
+##  Apply .f element-wise to .x, return an integer vector
+
+map_dbl(.x, .f, ...)
+n_iris %>% 
+  transmute(n = map_dbl(data, nrow))
+## Apply .f element-wise to .x, return a double vector
+
+map_chr(.x, .f, ...)
+n_iris %>% 
+  transmute(n = map_chr(data, nrow))
+## Apply .f element-wise to .x, return a character vector
+
+
+##  Use the purrr functions map_lgl(), map_int(), map_dbl(), map_chr(),
+##  as well as tidyr’s unnest() to reduce a list column into a regular column.
+  
+  
+}
+
+  ##### Nested - Make a column list ##### 
+}
+
+
+
+
+
+
+
+
+
+
+##### New sec
+
+
+
+
+
+
+
+
+
+}
+
+library(stringr)
+# library(stringr)
+{
+  #Manipulación de cadenas de texto con la librería STRINGR
+  
+  #Documentación y ejemplos: https://cran.r-project.org/web/packages/stringr/vignettes/stringr.html
+  #Cheatsheet de Stringr: https://github.com/rstudio/cheatsheets/blob/master/strings.pdf
+  
+  #Instalamos la librería
+  #install.packages("stringr")
+  
+  #Llamamos la librería para poder acceder a sus funciones
+  library(stringr)
+  library(dplyr)
+  library(readr)
+  
+  #Carga de datasets
+  Ejemplo_ventas <- read_csv("datasets/Dataset_VentasTienda.csv")
+  Ejemplo_TripAdvisor <- read_csv("datasets/Tripadvisor_Reviews.csv")
+  
+  #Las funciones más útiles son:
+  str_to_lower()
+  str_to_upper()
+  str_count()
+  str_detect()
+  str_extract()
+  str_replace()
+  str_replace_all()
+  str_replace_na()
+  
+  
+  ##### ESTAS FUNCIONES ME PERMITEN PONER TODAS LAS PALABRAS EN MINÚSCULA O MAYÚSCULA
+  str_to_lower()
+  str_to_upper()
+  
+  #normalmente suelen utilizarse en conjunción con mutate
+  iris %>%
+    mutate(Especie = str_to_lower(Species))
+  
+  iris %>%
+    mutate(Especie = str_to_upper(Species))
+  
+  
+  ###### FUNCIONES PARA BUSCAR DETERMINADAS PALABRAS DENTRO DE TODOS LOS TEXTOS
+  #str_detect detecta la presencia o ausencia de determinado patrón dentro del texto
+  str_detect(iris$Species, "ir")
+  str_detect(iris$Species, "tos")
+  
+  
+  #Puedo crear vectores de palabras relevantes y utilizar str_detect para detectarlas a todas
+  productos_comprados <- c("vegetables", "fruit", "berries")
+  Ejemplo_ventas %>%
+    filter(str_detect(itemDescription, paste(productos_comprados, collapse = '|')))
+  
+  
+  
+  ###### FUNCIONES PARA EXTRAER DETERMINADAS PALABRAS O CARACTERES DENTRO DE TODOS LOS TEXTOS
+  #str_extract extrae la primera palabra de un string que hace match con el pattern
+  head(
+    str_extract_all(Ejemplo_TripAdvisor$Review, pattern = "\\d")
+  )
+  
+  
+  
+  ###### FUNCIONES PARA REEMPLAZAR DETERMINADAS PALABRAS O CARACTERES DENTRO DE TODOS LOS TEXTOS
+  #cuando necesito corregir datos str_replace es una función muy útil para organizar mis dataset
+  
+  #Utilizando los bloques de regex, puedo limpiar mis datos de caracteres que no me interesan
+  Ejemplo_TripAdvisor_replace <- str_replace_all(Ejemplo_TripAdvisor$Review,"[[:punct:]]", " ")
+  
+  #Puedo eliminar todos los numeros
+  Ejemplo_TripAdvisor_replace2 <- str_replace_all(Ejemplo_TripAdvisor$Review,"[[:digit:]]", " ")
+  
+  #O eliminar palabras en concreto
+  Ejemplo_TripAdvisor_replace3 <- str_replace_all(Ejemplo_TripAdvisor$Review,"\\bhotel", "")
+  
+  
+  #A su vez podemos utilizarlo con las funciones de Dplyr para acelerar el desarrollo de nuestra limpieza
+  Ejemplo_TripAdvisor_replace4 <- Ejemplo_TripAdvisor %>%
+    select(Review) %>%
+    mutate(Review = str_replace_all(Review, '[[:digit:]]', ' ')) %>%
+    mutate(Review = str_replace_all(Review, '[[:punct:]]', ' ')) 
+  
+  Ejemplo_TripAdvisor_replace5 <- Ejemplo_TripAdvisor %>%
+    select(Review) %>%
+    mutate(Review = str_replace_all(Review, '[[:digit:]]', ' ')) %>%
+    mutate(Review = str_replace_all(Review, '[[:punct:]]', ' ')) %>%
+    mutate(Review = str_replace_all(Review, '\\s', '')) #hay que tener mucho cuidado como utilizarlo
+  
+}
+
+
+library(knitr)
+
+
+library(ggridges)
+
+library(NPS)
+library(caret)
+library(lubridate)
+library(corrplot)
+
+glue::glue(.x, " ", .y)
+broom::tidy
+
+
+https://bookdown.org/yihui/rmarkdown/basics.html#basics
+
+
+
+protsComp = c(232,62,53,56,61)
+protsPart = c(238,64,54,58,62)
+percComp = c(93.55,93.94,94.64,91.80,93.85)
+percPart = c(95.97,96.97,96.43,95.08,95.38)
+xaxis = c("Total", "Group 1", "Group 2", "Group 3", "Group 4")
+cegma1 = data.frame(xaxis, Complete = c(232,62,53,56,61), Partial = c(238,64,54,58,62))
+cegma.long = melt(cegma1)
+
+ggplot(cegma.long, aes(xaxis, value, fill=variable)) +  
+  geom_bar(position="dodge", stat="identity", color="black") +
+  geom_text(aes(x=xaxis, y=value, label = percent(value/100), vjust=3.5), 
+            position = position_dodge(width=0.9))
+
+
+
+
+

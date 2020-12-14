@@ -1,0 +1,434 @@
+---
+title: <div style="text-align:center"> **Proyecto Business Performance Analysis**<div/>
+author: <small> Jose Alejandro Miranda, Maria Jesus Palero, Jaime Andres Salazar y Paola Rita Villar.</small>
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    collapsed: true
+    number_sections: false
+    theme: cerulean
+    fig_width: 7
+    fig_height: 6
+    fig_caption: true
+---
+
+## **1. Preparación de los datos**
+
+Librerías a utilizar:
+
+```{r Librerias, warning=FALSE, message = FALSE}
+library(tidyverse) # tidyr, dplyr, ggplot2, purrr..... 
+library(DescTools) #Herramientas para estadística descriptiva y análisis de datos
+library(psych) #Herramientas de entrada de datos y análisis descriptivo.
+library(scales) #Herramienta complemento de "ggplot2"
+library (reshape2) #Herramientas de manipulación de datos
+library(ggpubr) #Complemento de ggplot
+library(ggplot2);theme_set(
+  theme_minimal() +
+    theme(legend.position = "right")) ## Tema por defecto a los gráficos
+library(ggsci) #Paletas de colores para graficos
+```
+
+Durante todo el análisis se trabaja con la base de datos suministrada "`Dataset_Compradores.csv`", la cual, para su estandarización, se extrae desde URL. Además, por indicaciones durante clase, la última variable `Exited` no se tiene en cuenta.
+
+```{r datos}
+
+data_ori <- read.csv("https://raw.githubusercontent.com/Lermaa2/ProjectoFinal-BPA/68c182ad59e0039875994b11acfcd40a66949acd/Dataset_Compradores.csv"
+                 ,dec=".")
+
+dat <- data_ori[2:13]; glimpse(dat);tail(dat[,1:4])
+
+```
+
+Se observa que existen 10000 entradas, no existen ni notas ni pie de páginas que puedan requerir ser eliminados antes del análisis. 
+
+## **2. Descripción de variables**
+
+Se indica el tipo de dato/variable con el que se trabaja, agrupándolas en dos grupos:
+
+##### **Categóricas/Cualitativas:**
+
+* `CustomerId`      : Identificación del cliente. Se transforma a factor. (`factor`/nominal).
+
+* `Surname`         : Apellido de los clientes. Se transforma a factor. (`factor`/nominal).
+
+* `Geography`       : País de origen de cada cliente. Se transforma a factor. (`factor`/nominal)
+
+* `Gender`         : Genero de cada cliente. Se transforma a factor. (`factor`/nominal)
+
+* `HasCrCard`       : Posee/ No posee (1/0) Tarjeta de Crédito. Se transforma a factor. (`factor``/nominal).
+
+* `IsActiveMember`  : Indica si el cliente esta/no está (1/0) activo en la entidad. 
+
+Todas se transforman a factor (`factor`/nominal).
+
+##### **Cuantitativas: **
+
+* `Age`             : Edad del cliente. (`int`/discreta).
+
+* `Tenure`          : Meses restantes para el pago total de la deuda. (`int`/discreta).
+
+* `CreditScore`     : Score de Crédito, valoración de cada cliente basado en su historial crediticio. (`int`/discreta).
+
+* `EstimatedSalary` : Salario estimado del cliente. (`num`/continua).
+
+* `Balance`         : Deuda pendiente de pago. (`num`/continua).
+
+* `NumOfProducts`   : Productos bancarios de cada cliente. (`int`discreta).
+
+El valor `CreditScore` se usa para asignar niveles a los clientes que dependen del modelo de cada banco, pero se suele usar:
+
+* 350 ~ 579 - `poor`
+
+* 580 ~ 669 - `fair`
+
+* 670 ~ 739 - `good` 
+
+* 740 ~ 799 - `very_good`
+
+* Mayor que 800 - `excellent`
+
+Para el análisis, se decide agregar la variable categórica `CreditCat` (`ord`/ordinal). Adicional a los cambios de clase mencionados, se busca conocer si existen valores nulos o NA:
+
+```{r data, warning=FALSE, message = FALSE}
+dat <-  data_ori[2:13] %>% 
+  mutate( CreditCat= case_when(CreditScore < 580 ~ 1,
+        CreditScore >= 580 & CreditScore < 669 ~ 2,
+        CreditScore >= 669 & CreditScore < 739 ~ 3,
+        CreditScore >= 739 & CreditScore < 799 ~ 4,
+        CreditScore >= 799 ~ 5,
+        TRUE ~ 0)) %>% 
+  select(CustomerId,Surname,Geography,Gender, 
+         IsActiveMember, HasCrCard, CreditCat,
+         CreditScore, Age, Balance,
+         EstimatedSalary, Tenure, NumOfProducts) %>% 
+  mutate(across(c(CustomerId,
+                  Surname,
+                  Geography,
+                  Gender,
+                  IsActiveMember,
+                  HasCrCard,
+                  CreditCat),
+                factor)) %>% 
+  rename_if(is.numeric,~paste("cu",.x,sep = "_") ) %>% 
+  rename_if(negate(is.numeric),~paste("ca",.x,sep = "_") )
+##* Para `CreditCat`:
+dat$ca_CreditCat <- factor(dat$ca_CreditCat, 
+                        labels = c("poor", "fair",
+                                   "good", "very_good",
+                                   "excellent"),ordered = T);glimpse(dat)
+##* Se da formato canónico a la tabla de datos, es decir, se muestra una fila para cada valor observado (medido). Útil para futuras manipulaciones.
+dat_long = melt(dat);glimpse(dat_long)
+```
+
+Siguiendo con las variables categóricas, para la exploración de los datos se han utilizado gráficos de barras. De esta manera, se pueden conocer los valores y frecuencias de cada una de las variables.: 
+
+```{r summ cat,fig.height = 4.5, message=FALSE}
+##* Frecuencias
+dat %>% 
+  select(starts_with("ca") & !ca_Surname) %>% 
+  summary()
+```
+
+De esta manera, se pueden conocer los valores y frecuencias de cada una de las variables categóricas. Además, cada observación/fila tiene un `CustomerId` único (es decir, datos de clientes diferentes) y en ningún caso se identifican entradas NaN.
+
+```{r fig.show='hold', message=FALSE, warning=FALSE, out.width=c('50%', '50%')}
+
+##* Geography
+dat %>% 
+  count(ca_Geography) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_Geography,n,label= prop,fill= ca_Geography)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()+
+  theme(legend.position='none')+
+  scale_fill_jco()
+
+##* CreditCat
+dat %>% 
+  count(ca_CreditCat) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_CreditCat,n,label= prop,fill= ca_CreditCat)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()+
+  theme(legend.position='none')+
+  scale_fill_nejm()
+```
+
+El 50% de los clientes son franceses, seguido por un 25% alemanes y 25% españoles.
+Además, existe un 26% de clientes con Credit Score `poor` mientras que solo el 20% tienen categoría igual o superior a `very goood`.
+
+```{r fq cate, fig.height = 4.4, fig.width =8}
+
+##* Gender
+plot_Gender <-dat %>% 
+  count(ca_Gender) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_Gender,n,label= prop,fill= ca_Gender)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()+
+  theme(legend.position='none')+
+  scale_fill_npg()
+
+##* IsActiveMember
+plot_Act <-dat %>% 
+  count(ca_IsActiveMember) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_IsActiveMember,n,label= prop,
+             fill=ca_IsActiveMember)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()  + 
+  scale_fill_manual("", values = c("0" = "#d62727", 
+                                   "1" = "#2ca02c"))+
+  theme(legend.position='none')
+
+##* HasCrCard
+plot_HCre <-dat %>% 
+  count(ca_HasCrCard) %>% 
+  mutate(prop = percent(prop.table(n))) %>% 
+  ggplot(aes(ca_HasCrCard,n,label= prop,fill= ca_HasCrCard)) +
+  geom_col(color="black")+
+  geom_text(check_overlap = TRUE,
+            position = position_stack(vjust = 0.5),
+            size=3)+
+  theme_bw()+
+  scale_fill_manual("", values = c("0" = "#d62727", 
+                                 "1" = "#2ca02c"))+
+  theme(legend.position='none')
+
+##* Visualización
+
+ggarrange(plot_Gender, plot_Act, plot_HCre,
+          ncol = 3, nrow = 1)
+
+```
+
+Se observa uniformidad entre las categorías de `Gender` y `IsActiveMember`.
+
+
+
+Para las variables cuantitativas, se indican los estadísticos básicos, al igual que la visualización de la dispersión y centralidad:
+
+```{r num ,fig.height = 4.5, message=FALSE}
+## Grafica
+
+##* Box
+dat_long %>% 
+  ggplot(aes(variable, value,fill=variable))+
+  geom_boxplot()+
+  geom_point(data=dat_long %>% 
+               group_by(variable) %>% 
+               summarise(mean= mean(value)), 
+             aes(variable,mean), shape=8)+
+  facet_wrap(.~variable, scales = "free")+
+  theme_bw()+
+  theme(legend.position='none')+
+  scale_fill_d3()
+
+##* Density
+dat_long %>% 
+  select(variable,value) %>% 
+  ggplot(aes(value,group=variable,fill=variable, alpha=0.7))+
+  geom_density(kernel = "gaussian")+
+  
+  geom_vline(data = dat_long %>%
+               group_by(variable) %>% 
+               summarise(mean= mean(value)),
+             aes(xintercept = mean))+
+  facet_wrap(.~variable, scales = "free")+
+  theme_bw()+
+  theme(legend.position='none',axis.text.x = element_text(angle = 90))+
+  scale_fill_d3()
+
+
+##* Tablas
+
+dat %>% 
+  select(starts_with("cu")) %>% 
+  describe() 
+
+dat %>% 
+  select(starts_with("cu")) %>% 
+  summary.data.frame()
+
+```
+
+Notamos a primera vista que, tanto por graficas como por tablas, las variables `CreditScore`, `Age` y `Balance` son las únicas con distribuciones similares a la norma. Además, a excepción de `Age` (posiblemente por sus outliers) poseen valor de asimetría entre -0.5 y 0.5, lo cual igualmente sugiere un comportamiento según distribución normal.
+
+Para representar las variables cuantitativas, se ha seleccionado el grafico boxplot donde se observan los valores extremos, el rango desde el primer hasta el tercer cuartil, la mediana y se ha representado la media mediante un asterisco.
+
+Por otra parte, se ha elegido utilizar gráficos de densidad para ver cómo se distribuyen los valores de cada variable y se ha representado la media con una línea vertical.
+
+Para cada variable cuantitativa se evaluará normalidad. Para ello se usa el test Kolmogorov-Smirnov y métodos visuales mediante gráfico de densidad y QQ plot (o quantile-quantile plot) en cada caso:
+
+```{r out.width=c('40%', '40%'), fig.show='hold', warning= FALSE}
+
+##* cu_EstimatedSalary
+g1 <- ggdensity(dat$cu_EstimatedSalary, fill = "#d62727")+
+  stat_overlay_normal_density(color = "red", linetype = "dashed") +
+  labs(x ="EstimatedSalary")
+g2 <- ggqqplot(dat$cu_EstimatedSalary)
+g1;g2
+
+##* cu_Tenure
+g1 <- ggdensity(dat$cu_Tenure, fill = "#9467bd")+
+  stat_overlay_normal_density(color = "red", linetype = "dashed") +
+  labs(x ="Tenure") 
+g2 <- ggqqplot(dat$cu_Tenure)
+g1;g2
+
+##* cu_NumOfProducts
+g1 <- ggdensity(dat$cu_NumOfProducts, fill = "#8c564b")+
+  stat_overlay_normal_density(color = "red", linetype = "dashed") +
+  labs(x ="NumOfProducts") 
+g2 <- ggqqplot(dat$cu_NumOfProducts)
+g1;g2
+
+
+
+```
+
+Para estos casos, es evidente que estas variables no siguen una distribución normal. Esto es esperado dada la naturaleza de `NumOfProducts` y `Tenure` al ser valores discretos y en el caso de `EstimatedSalary`, podría tratarse del modelo utilizado (supuesto).
+
+En cuanto a las variables con aparente tendencia normal:
+
+`CreditScore`
+
+```{r out.width=c('50%', '50%'), fig.show='hold', warning= FALSE}
+##* cu_CreditScore:
+
+g1 <- ggdensity(dat$cu_CreditScore, fill = "#1f77b4")+
+  stat_overlay_normal_density(color = "red", linetype = "dashed")+
+  labs(x ="CreditScore") 
+g2 <- ggqqplot(dat$cu_CreditScore)
+g1;g2
+```
+
+`Age`:
+
+```{r out.width=c('50%', '50%'), fig.show='hold', warning= FALSE}
+
+##* cu_Age
+g1 <- ggdensity(dat$cu_Age, fill = "#ff7f0e")+
+  stat_overlay_normal_density(color = "red", linetype = "dashed")+
+  labs(x ="Age") 
+g2 <- ggqqplot(dat$cu_Age)
+g1;g2
+```
+
+`Balance`:
+```{r out.width=c('50%', '50%'), fig.show='hold', warning= FALSE}
+
+##* cu_Balance
+g1 <- ggdensity(dat$cu_Balance, fill = "#2ca02c")+
+  stat_overlay_normal_density(color = "red", linetype = "dashed")+
+  labs(x ="Balance") 
+g2 <- ggqqplot(dat$cu_Balance)
+g1;g2
+```
+
+```{r, fig.show='hide', warning= FALSE, message = FALSE}
+##* Tabla
+dat_long %>% 
+  select(variable,value) %>% 
+  group_by(variable) %>% 
+  summarise(mean= round(mean(value),2),
+            sd= round(sd(value),2),
+            ks_pval = ks.test(value,"pnorm")$p.value,
+            ks_stat = round(ks.test(value,"pnorm")$statistic,2),
+            count_outliers= length(boxplot(value)$out)
+            )
+
+```
+El test, en todos los casos, nos muestra un P.value muy cercano a 0, indicando que se descarta la H~0~ y no seguirían una distribución normal (en función del análisis, sería necesaria una transformación previa.). Sin embargo, para el caso de `Age`, es posible que los outliers evidenciados influyan, por lo que se decide realizar el análisis removiéndolos:
+
+
+```{r out.width=c('50%', '50%'), fig.show='hide', warning= FALSE}
+
+##* cu_Age
+
+##* Para identificar outliers y removerlos (la gráfica previa nos permite identificar
+##* Que solo existen outliers superiores, por lo que se puede filtrar respecto al menor
+##* de ellos):
+out <- as.numeric(min (boxplot(dat$cu_Age)$out) )
+out <-dat %>% 
+  filter(cu_Age < out)
+```
+```{r out.width=c('50%', '50%'), fig.show='hold', warning= FALSE}
+g1 <- ggdensity(out$cu_Age, fill = "#ff7f0e")+
+  stat_overlay_normal_density(color = "red", linetype = "dashed")+
+  labs(x ="Age") 
+g2 <- ggqqplot(out$cu_Age)
+g1;g2
+
+ks.test(out$cu_Age,"pnorm")
+```
+
+Si bien gráficamente se pudiera manejar como normal, el test nos indica nuevamente que
+se rechaza H~0~, por lo que existe un 95% de certeza de que la distribución de la variable 
+`Age` no sigue una distribución normal.
+
+
+
+## **3. Análisis estadístico**
+
+##### **Realizar un análisis de comparación, siendo la hipótesis inicial: El salario de los consumidores es igual en los diferentes países donde se han recogido los datos**
+
+H~0~=El salario de los consumidores es igual en los diferentes países donde se han recogido los datos.
+
+H~a~=El salario de los consumidores no es igual en los diferentes países donde se han recogido los datos.
+
+Para ello, inicialmente se comparan visualmente y por dato las medias agrupadas por `Geography`
+
+```{r message=FALSE, out.width=c('50%', '50%'), fig.show='hold', warning= FALSE}
+medias<-dat %>% 
+  select(ca_Geography,cu_EstimatedSalary) %>% 
+  group_by(ca_Geography) %>% 
+  summarise(mean=mean(cu_EstimatedSalary))
+
+ggplot(dat, aes(ca_Geography,cu_EstimatedSalary,fill=ca_Geography))+
+  geom_boxplot()+
+  geom_point(data=medias,aes(ca_Geography,mean),shape=8)+
+  geom_line(data=medias,aes(ca_Geography,mean), group=1, color="red")+
+  theme_bw()+
+  theme(legend.position='none')+
+  scale_fill_jco()
+
+dat %>% 
+  ggplot(aes(cu_EstimatedSalary, fill = ca_Geography, alpha=0.9)) +
+  geom_density(kernel = "gaussian") +
+  geom_vline(data = dat %>%
+               group_by(ca_Geography) %>% 
+               summarise(mean= mean(cu_EstimatedSalary)),
+             aes(xintercept = mean))+
+  stat_overlay_normal_density(color = "red", linetype = "dashed")+
+  theme_bw()+
+  facet_grid(ca_Geography~.)+
+  theme(legend.position='none')+
+  scale_fill_d3()
+
+```
+
+Visualmente no se identifica mucha variación. Esto era de esperarse luego de ver previamente que la variable distribución de `EstimatedSalary` era uniforme.
+
+Sin embargo, se procede con la confirmación mediante test estadístico. Dado que se trata de 1 variable cuantitativa y 1 categórica de más de 2 niveles, se decide realizar el test anova:
+
+```{r}
+anova(lm(dat$cu_EstimatedSalary~dat$ca_Geography))
+```
+
+Según el análisis anova, el p-value es de 0.5584, al ser mayor a 0.05, no se rechaza la hipótesis nula H~0~, por tanto, la diferencia del salario no es significativamente diferente entre los países, hecho que se ve apoyado con la inspección grafica previa.
