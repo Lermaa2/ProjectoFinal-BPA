@@ -1,0 +1,7 @@
+"0",""
+"0","##* cu_Age"
+"0",""
+"0","##* Para identificar outliers y removerlos (la gráfica previa nos permite identificar"
+"0","##* Que solo existen outliers superiores, por lo que se puede filtrar respecto al menor"
+"0","##* de ellos):"
+"0","out <- as.numeric(min (boxplot(dat$cu_Age)$out) )"

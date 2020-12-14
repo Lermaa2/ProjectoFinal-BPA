@@ -1,0 +1,7 @@
+"0",""
+"0","##* cu_Balance"
+"0","g1 <- ggdensity(dat$cu_Balance, fill = ""#2ca02c"")+"
+"0","  stat_overlay_normal_density(color = ""red"", linetype = ""dashed"")+"
+"0","  labs(x =""Balance"") "
+"0","g2 <- ggqqplot(dat$cu_Balance)"
+"0","g1;g2"

@@ -1,0 +1,7 @@
+"0","##* cu_CreditScore:"
+"0",""
+"0","g1 <- ggdensity(dat$cu_CreditScore, fill = ""#1f77b4"")+"
+"0","  stat_overlay_normal_density(color = ""red"", linetype = ""dashed"")+"
+"0","  labs(x =""CreditScore"") "
+"0","g2 <- ggqqplot(dat$cu_CreditScore)"
+"0","g1;g2"

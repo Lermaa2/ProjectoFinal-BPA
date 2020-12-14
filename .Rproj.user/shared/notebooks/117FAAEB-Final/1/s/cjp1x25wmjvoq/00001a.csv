@@ -1,0 +1,7 @@
+"0",""
+"0","##* cu_NumOfProducts"
+"0","g1 <- ggdensity(dat$cu_NumOfProducts, fill = ""#8c564b"")+"
+"0","  stat_overlay_normal_density(color = ""red"", linetype = ""dashed"") +"
+"0","  labs(x =""NumOfProducts"") "
+"0","g2 <- ggqqplot(dat$cu_NumOfProducts)"
+"0","g1;g2"

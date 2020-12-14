@@ -130,13 +130,6 @@ dat %>%
   select(starts_with("cu")) %>% 
   describe()
 
-dat %>% 
-  select(starts_with("cu")) %>% 
-  summarise(across(everything(),~ks.test(.,"pnorm")$p.value))
-
-## Grafica
-
-
 ##* Box
 dat_long %>% 
   ggplot(aes(variable, value,fill=variable))+
@@ -148,7 +141,6 @@ dat_long %>%
   facet_wrap(.~variable, scales = "free")+
   theme_bw()+
   theme(legend.position='none')
-
 
 ##* Density
 dat_long %>% 
@@ -164,6 +156,43 @@ dat_long %>%
   facet_wrap(.~variable, scales = "free")+
   theme_bw()+
   theme(legend.position='top')
+
+```
+
+Se evalúa normalidad de cada variable, para ello se usa Kolmogorov-Smirnov  y métodos visuales mediante grafico de densidad y QQ plot (o quantile-quantile plot):
+
+```{r  ,fig.height = 4.5, message=FALSE, warning=FALSE}
+
+dat_long %>% 
+  select(variable,value) %>% 
+  group_by(variable) %>% 
+  summarise(mean= mean(value),
+            sd= sd(value),
+            ks_pval = ks.test(value,"pnorm")$p.value)
+
+##* Graficas
+
+
+##* cu_CreditScore:
+
+g1 <- ggdensity(dat$cu_CreditScore, fill = "lightgray")+
+  stat_overlay_normal_density(color = "red", linetype = "dashed")
+g2 <- ggqqplot(dat$cu_CreditScore)
+g2+ theme_bw()
+
+
+##* cu_Age
+
+##* cu_EstimatedSalary
+
+##* cu_Tenure
+
+##* cu_Balance
+
+##* cu_NumOfProducts
+
+
+
 ```
 
 Nuevamente, no se identifican valores NaN. Mas adelante se profundizará en los estadisticos.

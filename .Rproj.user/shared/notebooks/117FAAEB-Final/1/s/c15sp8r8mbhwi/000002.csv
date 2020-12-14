@@ -1,0 +1,7 @@
+"0",""
+"0","##* cu_Age"
+"0","g1 <- ggdensity(dat$cu_Age, fill = ""#ff7f0e"")+"
+"0","  stat_overlay_normal_density(color = ""red"", linetype = ""dashed"")+"
+"0","  labs(x =""Age"") "
+"0","g2 <- ggqqplot(dat$cu_Age)"
+"0","g1;g2"

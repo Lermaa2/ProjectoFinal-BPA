@@ -1,0 +1,7 @@
+"0",""
+"0","##* cu_Tenure"
+"0","g1 <- ggdensity(dat$cu_Tenure, fill = ""#9467bd"")+"
+"0","  stat_overlay_normal_density(color = ""red"", linetype = ""dashed"") +"
+"0","  labs(x =""Tenure"") "
+"0","g2 <- ggqqplot(dat$cu_Tenure)"
+"0","g1;g2"

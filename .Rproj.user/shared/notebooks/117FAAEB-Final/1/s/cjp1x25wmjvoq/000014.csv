@@ -1,0 +1,7 @@
+"0",""
+"0","##* cu_EstimatedSalary"
+"0","g1 <- ggdensity(dat$cu_EstimatedSalary, fill = ""#d62727"")+"
+"0","  stat_overlay_normal_density(color = ""red"", linetype = ""dashed"") +"
+"0","  labs(x =""EstimatedSalary"")"
+"0","g2 <- ggqqplot(dat$cu_EstimatedSalary)"
+"0","g1;g2"
