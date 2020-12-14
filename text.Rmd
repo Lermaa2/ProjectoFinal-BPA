@@ -1,17 +1,22 @@
 ---
-title: "Proyecto Business Performance Analysis"
-author: "JJMP"
-output: html_document
-
-  ##   html_document: default
-##     toc: true
-##     theme: united #darkly
-##     fig_caption: true
+title: <div style="text-align:center"> **Proyecto Business Performance Analysis**<div/>
+author: <small> Jose Alejandro Miranda, Maria Jesus Palero, Jaime Andres Salazar y Paola Rita Villar.</small>
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    collapsed: true
+    number_sections: false
+    theme: cerulean
+    fig_width: 7
+    fig_height: 6
+    fig_caption: true
 ---
 
-### **Preparación de los datos**
+##  **1. Preparacion de los datos**
 
-Librerias a utilziar:
+Librerias a utilizar:
 
 ```{r Librerias, warning=FALSE, message = FALSE}
 library(tidyverse) # tidyr, dplyr, ggplot2, purrr..... 
@@ -27,7 +32,7 @@ library(ggpubr)
 
 ```
 
-Se trabajara con la base de datos suministrada "`Dataset_Compradores.csv`", la cual, para estandarización, se extrae desde url. Además, por indicaciones durante clase, la ultima variable `Exited` no se tomará en cuenta, por lo que resulta:
+Durante todo el analisis se trabaja con la base de datos suministrada "`Dataset_Compradores.csv`", la cual, para su estandarizacion, se extrae desde URL. Ademas, por indicaciones durante clase, la ultima variable `Exited` no se  tiene en cuenta.
 
 ```{r datos}
 
@@ -35,46 +40,45 @@ data_ori <- read.csv("https://raw.githubusercontent.com/Lermaa2/ProjectoFinal-BP
                  ,dec=".")
 
 dat <- data_ori[2:13]; glimpse(dat);tail(dat[,1:4])
-##* Se busca tener un panorama general. 
+
 ```
+Se observa que existen 10000 entradas, no existen ni notas ni pie de paginas que puedan requerir ser eliminados antes del analisis. 
 
-Se observa que existen 10000 entradas, no existen notas, pie de paginas o similares que pudieran requerir ser removidos antes del analisis. 
+## **2. Describir de manera grafica y estadistica las variables de la base de datos**
 
-Ahora, se definie cada variable y se indica el tipo de dato/variable con el que se trabajará, agrupandolas en dos grupos:
+Ahora, se definie cada variable y se indica el tipo de dato/variable con el que se trabaja, agrupandolas en dos grupos, categoricas y cualitativas.
 
-##### Categoricas/Cualitativas:
+##### **Categoricas/Cualitativas:**
 
-* `CustomerId`      : Identifiación del cliente. Se transformará a factor. (`factor`/nominal).
+* `CustomerId`      : Identifiacion del cliente. Se transforma a factor. (`factor`/nominal).
 
-* `Surname`         : Apellido de los clientes. Se transformará a factor. (`factor`/nominal).
+* `Surname`         : Apellido de los clientes. Se transforma a factor. (`factor`/nominal).
 
-* `Geography`       : Pais de origen de cada cliente. Se transformará a factor. (`factor`/nominal)
+* `Geography`       : Pais de origen de cada cliente. Se transforma a factor. (`factor`/nominal)
 
-* `Gender`         : Genero de cada cliente. Se transformará a factor. (`factor`/nominal)
+* `Gender`         : Genero de cada cliente. Se transforma a factor. (`factor`/nominal)
 
-* `HasCrCard`       : Posee/No (1/0) posee Tarjeta de Credito. Se transformará a factor. (`factor``/nominal).
+* `HasCrCard`       : Posee/ No posee (1/0) Tarjeta de Credito. Se transforma a factor. (`factor``/nominal).
 
-* `IsActiveMember`  : Indica si el cliente está/no está (1/0) activo en la entidad. 
+* `IsActiveMember`  : Indica si el cliente esta/no esta (1/0) activo en la entidad. 
 
-
-Todas se transformarán a factor. (`factor`/nominal).
-
+Todas se transforman a factor (`factor`/nominal).
 
 ##### **Cuantitativas:**
 
 * `Age`             : Edad del cliente. (`int`/discreta).
 
-* `Tenure`          : Meses faltantes para pago total de la deuda. (`int`/discreta)
+* `Tenure`          : Meses restantes para el pago total de la deuda. (`int`/discreta).
 
-* `CreditScore`     : Score de Credito, valoración de cada cliente basado en el historial crediticio. (`int``/discreta).
+* `CreditScore`     : Score de Credito, valoracion de cada cliente basado en su historial crediticio. (`int`/discreta).
 
 * `EstimatedSalary` : Salario estimado del cliente. (`num`/continua).
 
 * `Balance`         : Deuda pendiente de pago. (`num`/continua).
 
-* `NumOfProducts`   : Productos bancarios de cada cliente. (`int``discreta).
+* `NumOfProducts`   : Productos bancarios de cada cliente. (`int`discreta).
 
-El valor `CreditScore` se usa para categorizarte en niveles que dependen del modelo de cada banco pero se suele usar:
+El valor `CreditScore` se usa para asignar niveles a los clientes que dependen del modelo de cada banco, pero se suele usar:
 
 * 350 ~ 579 - `poor`
 
@@ -84,9 +88,9 @@ El valor `CreditScore` se usa para categorizarte en niveles que dependen del mod
 
 * 740 ~ 799 - `very_good`
 
-*     > 800     - `excellent.` 
+* Mayor que 800 - `excellent`
 
-Como puede convenir para el análisis, se decide agregar variable categórica `CreditCat` (`ord`/ordinal). Adicional a los cambios de clase mencionados, se busca conocer si existen valores nulos o NA:
+Para el analisis, se decide agregar la variable categorica `CreditCat` (`ord`/ordinal). Adicional a los cambios de clase mencionados, se busca conocer si existen valores nulos o NA:
 
 ```{r data, warning=FALSE, message = FALSE}
 dat <-  data_ori[2:13] %>% 
@@ -115,17 +119,16 @@ dat$ca_CreditCat <- factor(dat$ca_CreditCat,
                         labels = c("poor", "fair",
                                    "good", "very_good",
                                    "excellent"),ordered = T);glimpse(dat)
-##* Se crea ademas formato canónico de la tabla de datos, es decir, que tiene una
-##* fila para cada valor observado (medido). 
+##* Se da formato canonico a la tabla de datos, es decir, se muestra una fila para cada valor observado (medido). 
 dat_long = melt(dat);glimpse(dat_long)
 ```
-Para las variables cuantitativas, se indican los estadisticos básicos inicialmente, al igual como visualización de la dispersión y centralidad:
+Para las variables cuantitativas, se indican los estadisticos basicos, al igual que la visualizacion de la dispersion y centralidad:
 
 ```{r num ,fig.height = 4.5, message=FALSE}
 dat %>% 
   select(starts_with("cu")) %>% 
   summary.data.frame()
-## Mas estadisticos básicos
+## Mas estadisticos basicos
 dat %>% 
   select(starts_with("cu")) %>% 
   describe()
@@ -155,6 +158,17 @@ dat_long %>%
   
   facet_wrap(.~variable, scales = "free")+
   theme_bw()+
+<<<<<<< HEAD
+  theme(legend.position='none')
+```
+
+Para representar las variables cuantitativas, se ha seleccionado el grafico boxplot donde se observan los valores extremos, el rango desde el primer hasta el tercer cuartil,la mediana y se ha representado la media mediante un asterisco.
+
+Nuevamente, no se identifican valores NaN. Mas adelante se profundizara en los estadisticos.
+
+En cuanto a las variables categoricas: 
+
+=======
   theme(legend.position='top')
 
 ```
@@ -199,13 +213,36 @@ Nuevamente, no se identifican valores NaN. Mas adelante se profundizará en los 
 
 En cuanto a las variables categóricas: 
 
+>>>>>>> 9f00a6aa66611583a6c3f942996e7619b15d0f4e
 ```{r summ cat,fig.height = 4.5, message=FALSE}
 ##* Frecuencias
 dat %>% 
   select(starts_with("ca") & !ca_Surname) %>% 
   summary()
 ```
+De esta manera, se  pueden conocer los valores y frecuencias de cada una de las variables categoricas. Ademas, cada observacion/fila tiene un `CustomerId` unico (es decir, datos de clientes diferentes) y en ningun caso se identifican entradas NaN.
 
+<<<<<<< HEAD
+## **3. Llevar a cabo un analisis estadistico en R e interpretar los resultados**
+
+##### **Realizar un analisis de comparacion, siendo la hipotesis inicial: El salario de los consumidores es igual en los diferentes paises donde se han recogido los datos**
+
+```{r}
+anova(lm(dat$cu_EstimatedSalary~dat$ca_Geography))
+```
+H~0~=El salario de los consumidores es igual en los diferentes paises donde se han recogido los datos.
+
+H~1~=El salario de los consumidores no es igual en los diferentes paises donde se han recogido los datos.
+
+Segun el analisis anova, el p-value es de 0.5584, al ser mayor a 0.05, no se rechaza la hipotesis nula, por tanto, la diferencia del salario no es significativamente diferente en alguno de los paises.
+
+```{r}
+medias<-dat %>% 
+  select(ca_Geography,cu_EstimatedSalary) %>% 
+  group_by(ca_Geography) %>% 
+  summarise(mean=mean(cu_EstimatedSalary))
+```
+=======
 ```{r fq cate, fig.height = 4.4, fig.width =8}
 
 ##* Geography
@@ -292,15 +329,15 @@ De esta manera, se  puede conocer los valores y frecuencias de cada una de las v
 
 
 
+>>>>>>> 9f00a6aa66611583a6c3f942996e7619b15d0f4e
 ```{r}
-
+ggplot(dat, aes(ca_Geography,cu_EstimatedSalary,fill=ca_Geography))+
+  geom_boxplot()+
+  geom_point(data=medias,aes(ca_Geography,mean),shape=2)
 
 ```
 
-
-
-
-
+Se observa que los salarios no son significativamente diferentes.
 
 
 
