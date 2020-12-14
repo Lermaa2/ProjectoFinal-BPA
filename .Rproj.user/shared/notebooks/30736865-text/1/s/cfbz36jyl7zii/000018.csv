@@ -1,0 +1,7 @@
+"0",""
+"0","## Solos"
+"0",""
+"0","dat %>%"
+"0","  ggplot(aes(cu_Age, cu_CreditScore))+"
+"0","  geom_jitter(alpha=0.5)+"
+"0","  geom_smooth(method = lm)"
